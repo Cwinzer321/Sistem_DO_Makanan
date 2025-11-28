@@ -433,38 +433,52 @@
                     </h2>
                     <ul class="feature-list">
                         <li>
+                            <i class="fas fa-utensils"></i>
+                            <div>
+                                <strong>Pilihan Menu Lengkap</strong>
+                                <span>Sistem menyediakan menu makanan dan minuman yang lengkap. Pelanggan dapat memilih dari 5 jenis makanan dan 5 jenis minuman dengan mudah menggunakan tombol quantity (+/-) untuk mengatur jumlah pesanan.</span>
+                            </div>
+                        </li>
+                        <li>
+                            <i class="fas fa-shopping-cart"></i>
+                            <div>
+                                <strong>Keranjang Belanja Interaktif</strong>
+                                <span>Pelanggan dapat melihat summary pesanan mereka secara real-time, termasuk detail item, quantity, dan total harga. Fitur cancel memungkinkan pelanggan untuk menghapus item yang tidak diinginkan dengan mudah.</span>
+                            </div>
+                        </li>
+                        <li>
                             <i class="fas fa-map-marked-alt"></i>
                             <div>
                                 <strong>Menentukan Lokasi Pelanggan</strong>
-                                <span>Pelanggan dapat memilih lokasi mereka langsung dari peta atau memasukkan koordinat untuk menentukan tempat pengantaran.</span>
+                                <span>Setelah memilih menu, pelanggan dapat memilih lokasi mereka langsung dari peta interaktif, menggunakan GPS, atau memasukkan koordinat manual untuk menentukan tempat pengantaran.</span>
                             </div>
                         </li>
                         <li>
                             <i class="fas fa-route"></i>
                             <div>
-                                <strong>Perhitungan Jarak</strong>
-                                <span>Sistem secara otomatis menghitung jarak antara restoran/toko dan lokasi pelanggan menggunakan teknologi GPS yang akurat dengan rute jalan yang sebenarnya.</span>
+                                <strong>Perhitungan Jarak Akurat</strong>
+                                <span>Sistem secara otomatis menghitung jarak antara restoran/toko dan lokasi pelanggan menggunakan teknologi GPS yang akurat dengan rute jalan yang sebenarnya melalui OSRM routing engine.</span>
                             </div>
                         </li>
                         <li>
                             <i class="fas fa-calculator"></i>
                             <div>
-                                <strong>Perhitungan Ongkir</strong>
-                                <span>Berdasarkan jarak yang dihitung, sistem menghitung ongkos kirim secara otomatis yang harus dibayar oleh pelanggan.</span>
+                                <strong>Perhitungan Ongkir Otomatis</strong>
+                                <span>Berdasarkan jarak yang dihitung, sistem menghitung ongkos kirim secara otomatis. Total pembayaran (menu + ongkir) ditampilkan secara real-time untuk transparansi harga.</span>
                             </div>
                         </li>
                         <li>
                             <i class="fab fa-whatsapp"></i>
                             <div>
                                 <strong>Integrasi WhatsApp</strong>
-                                <span>Setelah pemesanan, pelanggan dapat langsung mengirimkan informasi pesanan mereka ke restoran atau toko melalui WhatsApp untuk konfirmasi lebih lanjut.</span>
+                                <span>Setelah pemesanan, pelanggan dapat langsung mengirimkan informasi lengkap pesanan (menu, lokasi, jarak, ongkir, dan total) ke restoran atau toko melalui WhatsApp untuk konfirmasi lebih lanjut.</span>
                             </div>
                         </li>
                         <li>
                             <i class="fas fa-map"></i>
                             <div>
-                                <strong>Peta Interaktif</strong>
-                                <span>Pelanggan dapat melihat rute pengiriman secara visual di peta interaktif dengan garis rute yang mengikuti jalan sebenarnya.</span>
+                                <strong>Peta Interaktif dengan Rute</strong>
+                                <span>Pelanggan dapat melihat rute pengiriman secara visual di peta interaktif dengan garis rute yang mengikuti jalan sebenarnya. Menu yang dipilih juga ditampilkan di section lokasi untuk referensi.</span>
                             </div>
                         </li>
                     </ul>
@@ -486,28 +500,35 @@
                             <i class="fas fa-check-circle"></i>
                             <div>
                                 <strong>Mudah dan Cepat</strong>
-                                <span>Pelanggan dapat memilih lokasi dan melakukan pemesanan tanpa kesulitan mencari alamat.</span>
+                                <span>Pelanggan dapat memilih menu dengan mudah menggunakan tombol quantity, melihat summary real-time, dan menentukan lokasi tanpa kesulitan mencari alamat.</span>
                             </div>
                         </li>
                         <li>
                             <i class="fas fa-bullseye"></i>
                             <div>
                                 <strong>Akurasi Pengiriman</strong>
-                                <span>Sistem ini memastikan perhitungan jarak dan ongkos kirim yang lebih akurat dan efisien, sehingga pengiriman tepat waktu.</span>
+                                <span>Sistem ini memastikan perhitungan jarak dan ongkos kirim yang lebih akurat dan efisien menggunakan rute jalan sebenarnya, sehingga pengiriman tepat waktu.</span>
                             </div>
                         </li>
                         <li>
                             <i class="fas fa-smile"></i>
                             <div>
                                 <strong>Kenyamanan</strong>
-                                <span>Pelanggan dapat mengirimkan informasi pesanan langsung melalui WhatsApp, meminimalkan kesalahan komunikasi.</span>
+                                <span>Pelanggan dapat mengirimkan informasi lengkap pesanan (menu, lokasi, jarak, ongkir, total) langsung melalui WhatsApp, meminimalkan kesalahan komunikasi.</span>
                             </div>
                         </li>
                         <li>
                             <i class="fas fa-sliders-h"></i>
                             <div>
                                 <strong>Fleksibilitas</strong>
-                                <span>Pelanggan dapat memilih berbagai metode komunikasi dan cara pengiriman informasi, baik melalui peta atau koordinat manual.</span>
+                                <span>Pelanggan dapat mengubah pesanan kapan saja dengan tombol cancel, memilih berbagai metode untuk menentukan lokasi (peta, GPS, atau koordinat manual), dan kembali ke menu untuk mengubah pesanan.</span>
+                            </div>
+                        </li>
+                        <li>
+                            <i class="fas fa-eye"></i>
+                            <div>
+                                <strong>Transparansi Harga</strong>
+                                <span>Total pembayaran (menu + ongkir) ditampilkan secara real-time di section lokasi, memberikan transparansi penuh kepada pelanggan sebelum konfirmasi pesanan.</span>
                             </div>
                         </li>
                     </ul>
@@ -524,19 +545,23 @@
                     <div class="steps-container">
                         <div class="step-card">
                             <div class="step-number">1</div>
-                            <p class="step-text">Sistem menghitung jarak antara lokasi pelanggan dan restoran atau toko menggunakan rute jalan yang sebenarnya.</p>
+                            <p class="step-text"><strong>Pilih Menu</strong> - Pelanggan memilih makanan dan minuman yang diinginkan, mengatur quantity, dan melihat summary pesanan dengan total harga.</p>
                         </div>
                         <div class="step-card">
                             <div class="step-number">2</div>
-                            <p class="step-text">Ongkos kirim dihitung berdasarkan jarak dan ditampilkan kepada pelanggan secara otomatis.</p>
+                            <p class="step-text"><strong>Tentukan Lokasi</strong> - Setelah menu dipilih, pelanggan menentukan lokasi pengiriman melalui peta interaktif, GPS, atau koordinat manual.</p>
                         </div>
                         <div class="step-card">
                             <div class="step-number">3</div>
-                            <p class="step-text">Pelanggan dapat mengirimkan informasi pesanan mereka ke restoran via WhatsApp untuk konfirmasi.</p>
+                            <p class="step-text"><strong>Hitung Jarak & Ongkir</strong> - Sistem menghitung jarak menggunakan rute jalan sebenarnya dan menghitung ongkos kirim secara otomatis.</p>
                         </div>
                         <div class="step-card">
                             <div class="step-number">4</div>
-                            <p class="step-text">Rute pengiriman ditampilkan di peta interaktif dengan garis biru yang mengikuti jalan sebenarnya.</p>
+                            <p class="step-text"><strong>Lihat Total & Rute</strong> - Total pembayaran (menu + ongkir) ditampilkan. Rute pengiriman ditampilkan di peta dengan garis biru yang mengikuti jalan.</p>
+                        </div>
+                        <div class="step-card">
+                            <div class="step-number">5</div>
+                            <p class="step-text"><strong>Kirim ke WhatsApp</strong> - Pelanggan mengirim informasi lengkap pesanan (menu, lokasi, jarak, ongkir, total) ke restoran via WhatsApp untuk konfirmasi.</p>
                         </div>
                     </div>
                 </div>
