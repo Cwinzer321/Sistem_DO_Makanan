@@ -428,6 +428,164 @@
             color: var(--primary-color);
             margin-right: 0.5rem;
         }
+
+        /* Menu Items */
+        .menu-item {
+            background-color: var(--bg-input);
+            border: 2px solid transparent;
+            border-radius: 15px;
+            padding: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            height: 100%;
+        }
+
+        .menu-item:hover {
+            border-color: var(--primary-color);
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 230, 230, 0.2);
+        }
+
+        .menu-item.selected {
+            border-color: var(--primary-color);
+            background: linear-gradient(135deg, rgba(0, 230, 230, 0.1) 0%, rgba(0, 179, 179, 0.05) 100%);
+            box-shadow: 0 5px 20px rgba(0, 230, 230, 0.3);
+        }
+
+        .menu-item.selected::before {
+            content: '✓';
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background-color: var(--primary-color);
+            color: white;
+            width: 25px;
+            height: 25px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 0.9rem;
+        }
+
+        .menu-item-name {
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+            font-size: 1rem;
+        }
+
+        .menu-item-price {
+            color: var(--primary-color);
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+
+        .menu-item-quantity {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-top: 0.75rem;
+            justify-content: center;
+        }
+
+        .quantity-btn {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .quantity-btn:hover {
+            background-color: var(--primary-hover);
+            transform: scale(1.1);
+        }
+
+        .quantity-display {
+            color: var(--text-primary);
+            font-weight: 600;
+            min-width: 30px;
+            text-align: center;
+        }
+
+        .selected-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.75rem;
+            background-color: var(--bg-input);
+            border-radius: 10px;
+            margin-bottom: 0.5rem;
+        }
+
+        .selected-item-name {
+            color: var(--text-primary);
+            font-weight: 500;
+        }
+
+        .selected-item-details {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .selected-item-quantity {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .selected-item-price {
+            color: var(--primary-color);
+            font-weight: 600;
+        }
+
+        .remove-item-btn {
+            background-color: transparent;
+            border: none;
+            color: #ff4444;
+            cursor: pointer;
+            padding: 0.25rem 0.5rem;
+            border-radius: 5px;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+        }
+
+        .remove-item-btn:hover {
+            background-color: rgba(255, 68, 68, 0.1);
+            color: #ff6666;
+        }
+
+        .menu-summary-item {
+            padding: 0.5rem 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            font-size: 0.9rem;
+        }
+
+        .menu-summary-item:last-child {
+            border-bottom: none;
+        }
+
+        .menu-summary-name {
+            color: var(--text-primary);
+            margin-bottom: 0.25rem;
+        }
+
+        .menu-summary-details {
+            display: flex;
+            justify-content: space-between;
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+        }
     </style>
 </head>
 
@@ -477,7 +635,66 @@
                 </p>
             </div>
 
+            <!-- Menu Section -->
+            <div class="row fade-in mb-4" id="menuSection">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">
+                                <i class="fas fa-utensils"></i>
+                                Pilih Menu
+                            </h5>
+                            <p class="text-muted mb-4" style="color: var(--text-secondary);">
+                                Pilih makanan dan minuman yang ingin Anda pesan
+                            </p>
+                            
+                            <!-- Makanan -->
+                            <div class="mb-4">
+                                <h6 style="color: var(--primary-color); margin-bottom: 1rem; font-weight: 600;">
+                                    <i class="fas fa-hamburger"></i> Makanan
+                                </h6>
+                                <div class="row g-3" id="foodMenu">
+                                    <!-- Makanan akan di-generate oleh JavaScript -->
+                                </div>
+                            </div>
+
+                            <!-- Minuman -->
+                            <div class="mb-3">
+                                <h6 style="color: var(--primary-color); margin-bottom: 1rem; font-weight: 600;">
+                                    <i class="fas fa-glass-water"></i> Minuman
+                                </h6>
+                                <div class="row g-3" id="drinkMenu">
+                                    <!-- Minuman akan di-generate oleh JavaScript -->
+                                </div>
+                            </div>
+
+                            <!-- Selected Items Summary -->
+                            <div id="selectedItemsSummary" style="display: none; margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid rgba(255, 255, 255, 0.1);">
+                                <h6 style="color: var(--text-primary); margin-bottom: 1rem; font-weight: 600;">
+                                    <i class="fas fa-shopping-cart"></i> Pesanan Anda
+                                </h6>
+                                <div id="selectedItemsList" style="margin-bottom: 1rem;"></div>
+                                <div class="info-box">
+                                    <div class="info-item">
+                                        <span class="info-label">
+                                            <i class="fas fa-receipt"></i>
+                                            Total Harga
+                                        </span>
+                                        <span class="info-value" id="totalPrice">Rp 0</span>
+                                    </div>
+                                </div>
+                                <button class="btn btn-primary w-100 mt-3" onclick="proceedToLocation()">
+                                    <i class="fas fa-map-marker-alt"></i>
+                                    Lanjutkan ke Pilih Lokasi
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <!-- Map Section -->
+            <div id="locationSection" style="display: none;">
             <div class="row fade-in">
                 <div class="col-lg-8 mb-4">
                     <div class="map-container">
@@ -504,7 +721,28 @@
                                 <i class="fas fa-location-arrow"></i>
                                 Gunakan Lokasi Saya
                             </button>
+                            <button class="btn btn-secondary w-100 mb-3" onclick="backToMenu()" style="background: linear-gradient(135deg, #6c757d 0%, #5a6268 100%); color: white;">
+                                <i class="fas fa-arrow-left"></i>
+                                Kembali ke Menu
+                            </button>
                             
+                            <!-- Menu Summary di Location Section -->
+                            <div id="locationMenuSummary" style="display: none; margin-bottom: 1.5rem;">
+                                <h6 style="color: var(--text-primary); margin-bottom: 1rem; font-weight: 600;">
+                                    <i class="fas fa-shopping-cart"></i> Pesanan Anda
+                                </h6>
+                                <div class="info-box">
+                                    <div id="locationMenuList"></div>
+                                    <div class="info-item" style="margin-top: 0.75rem; padding-top: 0.75rem; border-top: 1px solid rgba(255, 255, 255, 0.1);">
+                                        <span class="info-label">
+                                            <i class="fas fa-receipt"></i>
+                                            Subtotal Menu
+                                        </span>
+                                        <span class="info-value" id="locationMenuTotal">Rp 0</span>
+                                    </div>
+                                </div>
+                            </div>
+
                             <div class="info-box">
                                 <div class="info-item">
                                     <span class="info-label">
@@ -519,6 +757,13 @@
                                         Ongkir
                                     </span>
                                     <span class="info-value" id="ongkir">-</span>
+                                </div>
+                                <div class="info-item" id="totalPaymentItem" style="display: none; margin-top: 0.75rem; padding-top: 0.75rem; border-top: 1px solid rgba(255, 255, 255, 0.1);">
+                                    <span class="info-label">
+                                        <i class="fas fa-calculator"></i>
+                                        Total Pembayaran
+                                    </span>
+                                    <span class="info-value" id="totalPayment">Rp 0</span>
                                 </div>
                             </div>
                             
@@ -544,6 +789,7 @@
                         </div>
                     </div>
                 </div>
+            </div>
             </div>
 
             <div class="section-divider"></div>
@@ -651,6 +897,343 @@
             lat: -6.251627,   // Latitude restoran
             lng: 107.246045   // Longitude restoran
         };
+
+        // Data Menu
+        const menuData = {
+            foods: [
+                { id: 'food1', name: 'Nasi Goreng Spesial', price: 25000 },
+                { id: 'food2', name: 'Mie Ayam Bakso', price: 20000 },
+                { id: 'food3', name: 'Gado-Gado', price: 18000 },
+                { id: 'food4', name: 'Sate Ayam (10 tusuk)', price: 30000 },
+                { id: 'food5', name: 'Rendang', price: 35000 }
+            ],
+            drinks: [
+                { id: 'drink1', name: 'Es Teh Manis', price: 5000 },
+                { id: 'drink2', name: 'Es Jeruk', price: 8000 },
+                { id: 'drink3', name: 'Jus Alpukat', price: 12000 },
+                { id: 'drink4', name: 'Es Campur', price: 10000 },
+                { id: 'drink5', name: 'Kopi Susu', price: 8000 }
+            ]
+        };
+
+        // Menyimpan pilihan menu user
+        let selectedMenu = {};
+
+        // ============================================
+        // FUNGSI MENU - RENDER DAN HANDLING
+        // ============================================
+        
+        /**
+         * Render menu items (makanan dan minuman) ke dalam HTML
+         */
+        function renderMenu() {
+            const foodContainer = document.getElementById('foodMenu');
+            const drinkContainer = document.getElementById('drinkMenu');
+            
+            // Render makanan
+            foodContainer.innerHTML = '';
+            menuData.foods.forEach(food => {
+                const menuItem = createMenuItem(food);
+                foodContainer.appendChild(menuItem);
+            });
+            
+            // Render minuman
+            drinkContainer.innerHTML = '';
+            menuData.drinks.forEach(drink => {
+                const menuItem = createMenuItem(drink);
+                drinkContainer.appendChild(menuItem);
+            });
+        }
+        
+        /**
+         * Membuat elemen menu item (card untuk setiap item menu)
+         * @param {Object} item - Objek menu dengan id, name, dan price
+         * @returns {HTMLElement} - Elemen div yang berisi menu item
+         */
+        function createMenuItem(item) {
+            const col = document.createElement('div');
+            col.className = 'col-md-6 col-lg-4';
+            
+            const quantity = selectedMenu[item.id]?.quantity || 0;
+            const isSelected = quantity > 0;
+            
+            col.innerHTML = `
+                <div class="menu-item ${isSelected ? 'selected' : ''}" data-id="${item.id}">
+                    <div class="menu-item-name">${item.name}</div>
+                    <div class="menu-item-price">Rp ${item.price.toLocaleString('id-ID')}</div>
+                    <div class="menu-item-quantity">
+                        <button class="quantity-btn" onclick="decreaseQuantity('${item.id}')" ${quantity === 0 ? 'style="opacity: 0.5; cursor: not-allowed;"' : ''}>-</button>
+                        <span class="quantity-display" id="qty-${item.id}">${quantity}</span>
+                        <button class="quantity-btn" onclick="increaseQuantity('${item.id}')">+</button>
+                    </div>
+                </div>
+            `;
+            
+            return col;
+        }
+        
+        /**
+         * Meningkatkan quantity item menu
+         * @param {string} itemId - ID item menu
+         */
+        function increaseQuantity(itemId) {
+            if (!selectedMenu[itemId]) {
+                selectedMenu[itemId] = { quantity: 0 };
+            }
+            selectedMenu[itemId].quantity++;
+            updateMenuDisplay();
+            updateSelectedItemsSummary();
+            updateLocationMenuDisplay();
+            updateTotalPayment();
+        }
+        
+        /**
+         * Mengurangi quantity item menu
+         * @param {string} itemId - ID item menu
+         */
+        function decreaseQuantity(itemId) {
+            if (!selectedMenu[itemId] || selectedMenu[itemId].quantity <= 0) {
+                return;
+            }
+            selectedMenu[itemId].quantity--;
+            if (selectedMenu[itemId].quantity === 0) {
+                delete selectedMenu[itemId];
+            }
+            updateMenuDisplay();
+            updateSelectedItemsSummary();
+            updateLocationMenuDisplay();
+            updateTotalPayment();
+        }
+        
+        /**
+         * Update tampilan menu setelah perubahan quantity
+         */
+        function updateMenuDisplay() {
+            // Update semua menu items
+            const allItems = [...menuData.foods, ...menuData.drinks];
+            allItems.forEach(item => {
+                const quantity = selectedMenu[item.id]?.quantity || 0;
+                const menuItemElement = document.querySelector(`.menu-item[data-id="${item.id}"]`);
+                const quantityDisplay = document.getElementById(`qty-${item.id}`);
+                const decreaseBtn = menuItemElement?.querySelector('.quantity-btn');
+                
+                if (menuItemElement) {
+                    if (quantity > 0) {
+                        menuItemElement.classList.add('selected');
+                    } else {
+                        menuItemElement.classList.remove('selected');
+                    }
+                }
+                
+                if (quantityDisplay) {
+                    quantityDisplay.textContent = quantity;
+                }
+                
+                if (decreaseBtn) {
+                    if (quantity === 0) {
+                        decreaseBtn.style.opacity = '0.5';
+                        decreaseBtn.style.cursor = 'not-allowed';
+                    } else {
+                        decreaseBtn.style.opacity = '1';
+                        decreaseBtn.style.cursor = 'pointer';
+                    }
+                }
+            });
+        }
+        
+        /**
+         * Menghapus item dari pesanan
+         * @param {string} itemId - ID item menu yang akan dihapus
+         */
+        function removeItem(itemId) {
+            if (selectedMenu[itemId]) {
+                delete selectedMenu[itemId];
+                updateMenuDisplay();
+                updateSelectedItemsSummary();
+                updateLocationMenuDisplay();
+                updateTotalPayment();
+                showToast('Item berhasil dihapus dari pesanan', 'success');
+            }
+        }
+        
+        /**
+         * Update summary pesanan yang dipilih
+         */
+        function updateSelectedItemsSummary() {
+            const summarySection = document.getElementById('selectedItemsSummary');
+            const itemsList = document.getElementById('selectedItemsList');
+            const totalPriceElement = document.getElementById('totalPrice');
+            
+            // Hitung total item yang dipilih
+            const totalItems = Object.values(selectedMenu).reduce((sum, item) => sum + item.quantity, 0);
+            
+            if (totalItems === 0) {
+                // Sembunyikan summary jika tidak ada item yang dipilih
+                summarySection.style.display = 'none';
+                return;
+            }
+            
+            // Tampilkan summary
+            summarySection.style.display = 'block';
+            
+            // Render daftar item yang dipilih
+            itemsList.innerHTML = '';
+            let totalPrice = 0;
+            
+            const allItems = [...menuData.foods, ...menuData.drinks];
+            allItems.forEach(item => {
+                const quantity = selectedMenu[item.id]?.quantity || 0;
+                if (quantity > 0) {
+                    const itemTotal = item.price * quantity;
+                    totalPrice += itemTotal;
+                    
+                    const itemElement = document.createElement('div');
+                    itemElement.className = 'selected-item';
+                    itemElement.innerHTML = `
+                        <div class="selected-item-name">${item.name}</div>
+                        <div class="selected-item-details">
+                            <span class="selected-item-quantity">${quantity}x</span>
+                            <span class="selected-item-price">Rp ${itemTotal.toLocaleString('id-ID')}</span>
+                            <button class="remove-item-btn" onclick="removeItem('${item.id}')" title="Hapus item">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                    `;
+                    itemsList.appendChild(itemElement);
+                }
+            });
+            
+            // Update total harga
+            totalPriceElement.textContent = `Rp ${totalPrice.toLocaleString('id-ID')}`;
+        }
+        
+        /**
+         * Update tampilan menu di location section
+         */
+        function updateLocationMenuDisplay() {
+            const locationMenuSummary = document.getElementById('locationMenuSummary');
+            const locationMenuList = document.getElementById('locationMenuList');
+            const locationMenuTotal = document.getElementById('locationMenuTotal');
+            
+            // Hitung total item yang dipilih
+            const totalItems = Object.values(selectedMenu).reduce((sum, item) => sum + item.quantity, 0);
+            
+            if (totalItems === 0) {
+                // Sembunyikan summary jika tidak ada item yang dipilih
+                locationMenuSummary.style.display = 'none';
+                return;
+            }
+            
+            // Tampilkan summary
+            locationMenuSummary.style.display = 'block';
+            
+            // Render daftar item yang dipilih
+            locationMenuList.innerHTML = '';
+            let totalPrice = 0;
+            
+            const allItems = [...menuData.foods, ...menuData.drinks];
+            allItems.forEach(item => {
+                const quantity = selectedMenu[item.id]?.quantity || 0;
+                if (quantity > 0) {
+                    const itemTotal = item.price * quantity;
+                    totalPrice += itemTotal;
+                    
+                    const itemElement = document.createElement('div');
+                    itemElement.className = 'menu-summary-item';
+                    itemElement.innerHTML = `
+                        <div class="menu-summary-name">${item.name}</div>
+                        <div class="menu-summary-details">
+                            <span>${quantity}x × Rp ${item.price.toLocaleString('id-ID')}</span>
+                            <span style="color: var(--primary-color); font-weight: 600;">Rp ${itemTotal.toLocaleString('id-ID')}</span>
+                        </div>
+                    `;
+                    locationMenuList.appendChild(itemElement);
+                }
+            });
+            
+            // Update total harga
+            locationMenuTotal.textContent = `Rp ${totalPrice.toLocaleString('id-ID')}`;
+            
+            // Update total pembayaran jika ongkir sudah dihitung
+            updateTotalPayment();
+        }
+        
+        /**
+         * Update total pembayaran (menu + ongkir)
+         */
+        function updateTotalPayment() {
+            const totalPaymentItem = document.getElementById('totalPaymentItem');
+            const totalPayment = document.getElementById('totalPayment');
+            const ongkirText = document.getElementById('ongkir').textContent;
+            
+            // Hitung total menu
+            const allItems = [...menuData.foods, ...menuData.drinks];
+            let totalMenuPrice = 0;
+            allItems.forEach(item => {
+                const quantity = selectedMenu[item.id]?.quantity || 0;
+                if (quantity > 0) {
+                    totalMenuPrice += item.price * quantity;
+                }
+            });
+            
+            // Parse ongkir dari text (format: "Rp 15.000" atau "-")
+            let ongkir = 0;
+            if (ongkirText !== '-') {
+                const ongkirMatch = ongkirText.match(/[\d.]+/);
+                if (ongkirMatch) {
+                    ongkir = parseInt(ongkirMatch[0].replace(/\./g, ''));
+                }
+            }
+            
+            // Tampilkan total pembayaran jika ongkir sudah dihitung
+            if (ongkir > 0) {
+                const total = totalMenuPrice + ongkir;
+                totalPayment.textContent = `Rp ${total.toLocaleString('id-ID')}`;
+                totalPaymentItem.style.display = 'flex';
+            } else {
+                totalPaymentItem.style.display = 'none';
+            }
+        }
+        
+        /**
+         * Proceed ke section lokasi setelah memilih menu
+         */
+        function proceedToLocation() {
+            const totalItems = Object.values(selectedMenu).reduce((sum, item) => sum + item.quantity, 0);
+            
+            if (totalItems === 0) {
+                showToast('Silakan pilih menu terlebih dahulu!', 'error');
+                return;
+            }
+            
+            // Sembunyikan menu section
+            document.getElementById('menuSection').style.display = 'none';
+            
+            // Tampilkan location section
+            document.getElementById('locationSection').style.display = 'block';
+            
+            // Update tampilan menu di location section
+            updateLocationMenuDisplay();
+            
+            // Scroll ke location section
+            document.getElementById('locationSection').scrollIntoView({ behavior: 'smooth', block: 'start' });
+            
+            showToast('Silakan pilih lokasi pengiriman Anda', 'success');
+        }
+        
+        /**
+         * Kembali ke menu section untuk mengubah pesanan
+         */
+        function backToMenu() {
+            // Sembunyikan location section
+            document.getElementById('locationSection').style.display = 'none';
+            
+            // Tampilkan menu section
+            document.getElementById('menuSection').style.display = 'block';
+            
+            // Scroll ke menu section
+            document.getElementById('menuSection').scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
 
         // ============================================
         // FUNGSI UTILITAS - TOAST NOTIFICATION
@@ -1006,6 +1589,9 @@
                 // Update tampilan ongkir dengan format rupiah Indonesia
                 document.getElementById("ongkir").innerText = `Rp ${ongkir.toLocaleString("id-ID")}`;
 
+                // Update total pembayaran (menu + ongkir)
+                updateTotalPayment();
+
                 // Tampilkan section untuk input catatan/note
                 document.getElementById("noteSection").style.display = "block";
 
@@ -1034,11 +1620,36 @@
                     const googleMapsLink = `https://www.google.com/maps?q=${customerLatLng.lat},${customerLatLng.lng}`;
                     
                     // Buat template pesan WhatsApp dengan informasi lengkap
-                    let pesanWA = `Halo, saya ingin memesan makanan.\n\n📍 Lokasi Saya:\n${googleMapsLink}\n\nKoordinat:\nLatitude: ${customerLatLng.lat.toFixed(6)}\nLongitude: ${customerLatLng.lng.toFixed(6)}\n\n📏 Jarak: ${distanceForMessage}\n💰 Ongkir: Rp ${ongkir.toLocaleString("id-ID")}`;
+                    let pesanWA = `Halo, saya ingin memesan makanan.\n\n`;
+                    
+                    // Tambahkan detail menu yang dipilih
+                    const allItems = [...menuData.foods, ...menuData.drinks];
+                    let menuItems = [];
+                    let totalMenuPrice = 0;
+                    
+                    allItems.forEach(item => {
+                        const quantity = selectedMenu[item.id]?.quantity || 0;
+                        if (quantity > 0) {
+                            const itemTotal = item.price * quantity;
+                            totalMenuPrice += itemTotal;
+                            menuItems.push(`${item.name} x${quantity} = Rp ${itemTotal.toLocaleString('id-ID')}`);
+                        }
+                    });
+                    
+                    if (menuItems.length > 0) {
+                        pesanWA += `🍽️ *Pesanan Saya:*\n${menuItems.join('\n')}\n`;
+                        pesanWA += `\n💰 *Subtotal Menu:* Rp ${totalMenuPrice.toLocaleString('id-ID')}\n`;
+                    }
+                    
+                    pesanWA += `\n📍 *Lokasi Saya:*\n${googleMapsLink}\n\nKoordinat:\nLatitude: ${customerLatLng.lat.toFixed(6)}\nLongitude: ${customerLatLng.lng.toFixed(6)}\n\n📏 Jarak: ${distanceForMessage}\n💰 Ongkir: Rp ${ongkir.toLocaleString("id-ID")}`;
+                    
+                    // Hitung total keseluruhan
+                    const totalAll = totalMenuPrice + ongkir;
+                    pesanWA += `\n\n💵 *Total Pembayaran:* Rp ${totalAll.toLocaleString('id-ID')}`;
                     
                     // Tambahkan catatan/request jika user mengisi field note
                     if (customerNote) {
-                        pesanWA += `\n\n📝 Pesanan saya:\n${customerNote}`;
+                        pesanWA += `\n\n📝 *Catatan:*\n${customerNote}`;
                     }
                     
                     // Tambahkan instruksi untuk membuka Google Maps
@@ -1269,6 +1880,7 @@
          */
         window.addEventListener('DOMContentLoaded', () => {
             initMap();  // Inisialisasi peta
+            renderMenu();  // Render menu items
         });
     </script>
 </body>
