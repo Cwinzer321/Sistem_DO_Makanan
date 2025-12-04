@@ -9,6 +9,9 @@
     <meta name="author" content="Order Delivery Team">
     <title>Delivery Order dengan Peta | Sistem Pemesanan Online</title>
     
+    <!-- Favicon -->
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📍</text></svg>">
+    
     <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
@@ -106,6 +109,16 @@
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
+        }
+
+        .page-title i {
+            -webkit-text-fill-color: var(--primary-color);
+            background: none;
+            color: var(--primary-color);
         }
 
         .page-subtitle {
@@ -182,6 +195,25 @@
             font-family: 'Poppins', sans-serif;
             resize: vertical;
             min-height: 80px;
+        }
+
+        .input-group-text {
+            background-color: var(--bg-input);
+            border: 2px solid transparent;
+            color: var(--text-secondary);
+        }
+
+        .input-group:focus-within .input-group-text {
+            border-color: var(--primary-color);
+        }
+
+        .form-select.input-box {
+            cursor: pointer;
+        }
+
+        .form-select.input-box option {
+            background-color: var(--bg-input);
+            color: var(--text-primary);
         }
 
         .form-label {
@@ -366,6 +398,34 @@
             .card-body {
                 padding: 1.5rem;
             }
+
+            .menu-item {
+                padding: 0.75rem;
+            }
+
+            .menu-item-image {
+                height: 150px;
+            }
+
+            .menu-item-content {
+                padding: 0.75rem;
+            }
+
+            .menu-item-name {
+                font-size: 0.9rem;
+            }
+
+            .menu-item-price {
+                font-size: 1rem;
+            }
+
+            .menu-item-description {
+                font-size: 0.75rem;
+            }
+
+            .description-list li {
+                font-size: 0.75rem;
+            }
         }
 
         @keyframes fadeIn {
@@ -434,11 +494,14 @@
             background-color: var(--bg-input);
             border: 2px solid transparent;
             border-radius: 15px;
-            padding: 1rem;
+            padding: 0;
             cursor: pointer;
             transition: all 0.3s ease;
             position: relative;
             height: 100%;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
         }
 
         .menu-item:hover {
@@ -468,6 +531,47 @@
             justify-content: center;
             font-weight: bold;
             font-size: 0.9rem;
+            z-index: 10;
+        }
+
+        .menu-item-image {
+            width: 100%;
+            height: 200px;
+            overflow: hidden;
+            position: relative;
+            background: linear-gradient(135deg, var(--bg-card) 0%, var(--bg-input) 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .menu-item-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.3s ease;
+        }
+
+        .menu-item-image .image-placeholder {
+            font-size: 4rem;
+            color: var(--text-secondary);
+            opacity: 0.4;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            height: 100%;
+        }
+
+        .menu-item:hover .menu-item-image img {
+            transform: scale(1.1);
+        }
+
+        .menu-item-content {
+            padding: 1rem;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
         }
 
         .menu-item-name {
@@ -477,10 +581,61 @@
             font-size: 1rem;
         }
 
+        .menu-item-description {
+            margin-bottom: 0.75rem;
+            font-size: 0.85rem;
+        }
+
+        .description-label {
+            color: var(--text-secondary);
+            font-size: 0.8rem;
+            font-weight: 500;
+            margin-bottom: 0.25rem;
+        }
+
+        .description-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            color: var(--text-secondary);
+        }
+
+        .description-list li {
+            padding: 0.2rem 0;
+            padding-left: 1rem;
+            position: relative;
+            font-size: 0.85rem;
+            line-height: 1.4;
+        }
+
+        .description-list li::before {
+            content: '•';
+            position: absolute;
+            left: 0;
+            color: var(--primary-color);
+            font-weight: bold;
+        }
+
         .menu-item-price {
             color: var(--primary-color);
             font-weight: 600;
             font-size: 1.1rem;
+            margin-top: auto;
+        }
+
+        /* Sticky Total Pesanan */
+        #selectedItemsSummary {
+            position: sticky;
+            bottom: 20px;
+            background-color: var(--bg-card);
+            border-radius: 15px;
+            padding: 1.5rem;
+            box-shadow: 0 -5px 20px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(0, 230, 230, 0.2);
+            z-index: 100;
+            margin-top: 1.5rem;
+            margin-bottom: 1rem;
+            backdrop-filter: blur(10px);
         }
 
         .menu-item-quantity {
@@ -623,17 +778,20 @@
     <!-- Main Content -->
     <div class="main-content">
         <div class="container">
+            
             <!-- Hero Section -->
-            <div class="hero-section fade-in">
+            <!-- <div class="hero-section fade-in">
                 <span class="badge-custom">
                     <i class="fas fa-star"></i> Sistem
                 </span>
-                <h1 class="page-title">Order Delivery dengan Peta</h1>
+                <h1 class="page-title">
+                    <i class="fas fa-map-marked-alt"></i> Order Delivery dengan Peta
+                </h1>
                 <p class="page-subtitle">
                     Solusi lengkap untuk pemesanan online dengan perhitungan ongkir otomatis, 
                     integrasi peta interaktif, dan pengiriman pesanan via WhatsApp
                 </p>
-            </div>
+            </div> -->
 
             <!-- Menu Section -->
             <div class="row fade-in mb-4" id="menuSection">
@@ -645,8 +803,26 @@
                                 Pilih Menu
                             </h5>
                             <p class="text-muted mb-4" style="color: var(--text-secondary);">
-                                Pilih makanan dan minuman yang ingin Anda pesan
+                                Pilih makanan yang ingin Anda pesan
                             </p>
+                            
+                            <!-- Filter Dropdown -->
+                            <div class="mb-4">
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <label for="filterFoodName" class="form-label" style="color: var(--text-primary); font-weight: 500; margin-bottom: 0.5rem;">
+                                            <i class="fas fa-filter"></i> Filter Makanan
+                                        </label>
+                                        <select 
+                                            class="form-select input-box" 
+                                            id="filterFoodName" 
+                                            onchange="filterMenuByName()">
+                                            <option value="all">Semua Makanan</option>
+                                            <!-- Opsi makanan akan di-generate oleh JavaScript -->
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
                             
                             <!-- Makanan -->
                             <div class="mb-4">
@@ -655,16 +831,6 @@
                                 </h6>
                                 <div class="row g-3" id="foodMenu">
                                     <!-- Makanan akan di-generate oleh JavaScript -->
-                                </div>
-                            </div>
-
-                            <!-- Minuman -->
-                            <div class="mb-3">
-                                <h6 style="color: var(--primary-color); margin-bottom: 1rem; font-weight: 600;">
-                                    <i class="fas fa-glass-water"></i> Minuman
-                                </h6>
-                                <div class="row g-3" id="drinkMenu">
-                                    <!-- Minuman akan di-generate oleh JavaScript -->
                                 </div>
                             </div>
 
@@ -795,7 +961,7 @@
             <div class="section-divider"></div>
 
             <!-- Features Section -->
-            <div class="features-section fade-in">
+            <!-- <div class="features-section fade-in">
                 <div class="row g-4">
                     <div class="col-md-4">
                         <div class="feature-card">
@@ -831,7 +997,7 @@
                         </div>
                     </div>
                 </div>
-            </div>
+            </div> -->
         </div>
     </div>
 
@@ -901,75 +1067,172 @@
         // Data Menu
         const menuData = {
             foods: [
-                { id: 'food1', name: 'Nasi Goreng Spesial', price: 25000 },
-                { id: 'food2', name: 'Mie Ayam Bakso', price: 20000 },
-                { id: 'food3', name: 'Gado-Gado', price: 18000 },
-                { id: 'food4', name: 'Sate Ayam (10 tusuk)', price: 30000 },
-                { id: 'food5', name: 'Rendang', price: 35000 }
-            ],
-            drinks: [
-                { id: 'drink1', name: 'Es Teh Manis', price: 5000 },
-                { id: 'drink2', name: 'Es Jeruk', price: 8000 },
-                { id: 'drink3', name: 'Jus Alpukat', price: 12000 },
-                { id: 'drink4', name: 'Es Campur', price: 10000 },
-                { id: 'drink5', name: 'Kopi Susu', price: 8000 }
+                { 
+                    id: 'food1', 
+                    name: 'Kimbab', 
+                    price: 15000, 
+                    image: 'img/kimbab15k.jpg',
+                    description: ['Nasi', 'Wortel', 'Timun', 'Telur', 'Rumput laut']
+                },
+                { 
+                    id: 'food2', 
+                    name: 'Ricebowl', 
+                    price: 20000, 
+                    image: 'img/ricebowl.jpg',
+                    description: ['Ayam', 'Nasi', 'Saus cabe', 'Timun', 'Seledri']
+                },
+                { 
+                    id: 'food3', 
+                    name: 'ricebowl+kimbab', 
+                    price: 20000, 
+                    image: 'img/ricebowl+kimbab20k.jpg',
+                    description: ['ricebowl', 'kimbab']
+                },
+                { 
+                    id: 'food4', 
+                    name: 'Mac and Cheese', 
+                    price: 30000, 
+                    image: 'img/Mac and Cheese.jpg',
+                    description: ['Pasta', 'Keju', 'Susu', 'Mentega', 'Bumbu']
+                },
+                { 
+                    id: 'food5', 
+                    name: 'Kimbab Isi 4', 
+                    price: 35000, 
+                    image: 'https://images.unsplash.com/photo-1586201375761-83865001e31c?w=400&h=300&fit=crop',
+                    description: ['Daging sapi', 'Santan', 'Bumbu rempah', 'Nasi putih']
+                }
             ]
         };
 
         // Menyimpan pilihan menu user
         let selectedMenu = {};
+        
+        // Menyimpan makanan yang sudah difilter
+        let filteredFoods = [...menuData.foods];
 
         // ============================================
         // FUNGSI MENU - RENDER DAN HANDLING
         // ============================================
         
         /**
-         * Render menu items (makanan dan minuman) ke dalam HTML
+         * Populate dropdown filter dengan nama makanan
          */
-        function renderMenu() {
-            const foodContainer = document.getElementById('foodMenu');
-            const drinkContainer = document.getElementById('drinkMenu');
+        function populateFilterDropdown() {
+            const filterDropdown = document.getElementById('filterFoodName');
+            if (!filterDropdown) return;
             
-            // Render makanan
-            foodContainer.innerHTML = '';
+            // Hapus semua opsi kecuali "Semua Makanan"
+            while (filterDropdown.children.length > 1) {
+                filterDropdown.removeChild(filterDropdown.lastChild);
+            }
+            
+            // Tambahkan opsi untuk setiap makanan
             menuData.foods.forEach(food => {
-                const menuItem = createMenuItem(food);
-                foodContainer.appendChild(menuItem);
-            });
-            
-            // Render minuman
-            drinkContainer.innerHTML = '';
-            menuData.drinks.forEach(drink => {
-                const menuItem = createMenuItem(drink);
-                drinkContainer.appendChild(menuItem);
+                const option = document.createElement('option');
+                option.value = food.id;
+                option.textContent = food.name;
+                filterDropdown.appendChild(option);
             });
         }
         
         /**
+         * Filter menu berdasarkan nama makanan yang dipilih
+         */
+        function filterMenuByName() {
+            const filterDropdown = document.getElementById('filterFoodName');
+            const selectedValue = filterDropdown.value;
+            
+            if (selectedValue === 'all') {
+                // Tampilkan semua makanan
+                filteredFoods = [...menuData.foods];
+            } else {
+                // Filter berdasarkan ID makanan yang dipilih
+                filteredFoods = menuData.foods.filter(food => food.id === selectedValue);
+            }
+            
+            // Re-render menu
+            renderMenu();
+        }
+        
+        /**
+         * Render menu items (makanan) ke dalam HTML
+         */
+        function renderMenu() {
+            const foodContainer = document.getElementById('foodMenu');
+            
+            // Render makanan yang sudah difilter
+            if (foodContainer) {
+                foodContainer.innerHTML = '';
+                filteredFoods.forEach(food => {
+                    const menuItem = createMenuItem(food);
+                    foodContainer.appendChild(menuItem);
+                });
+            }
+        }
+        
+        /**
          * Membuat elemen menu item (card untuk setiap item menu)
-         * @param {Object} item - Objek menu dengan id, name, dan price
+         * @param {Object} item - Objek menu dengan id, name, price, image, dan description
          * @returns {HTMLElement} - Elemen div yang berisi menu item
          */
         function createMenuItem(item) {
             const col = document.createElement('div');
-            col.className = 'col-md-6 col-lg-4';
+            col.className = 'col-6 col-md-6 col-lg-4';
             
             const quantity = selectedMenu[item.id]?.quantity || 0;
             const isSelected = quantity > 0;
+            const imageUrl = item.image || '';
+            const description = item.description || [];
+            
+            // Format deskripsi menjadi list
+            let descriptionHTML = '';
+            if (description.length > 0) {
+                descriptionHTML = `
+                    <div class="menu-item-description">
+                        <div class="description-label">Isi:</div>
+                        <ul class="description-list">
+                            ${description.map(desc => `<li>${desc}</li>`).join('')}
+                        </ul>
+                    </div>
+                `;
+            }
             
             col.innerHTML = `
                 <div class="menu-item ${isSelected ? 'selected' : ''}" data-id="${item.id}">
-                    <div class="menu-item-name">${item.name}</div>
-                    <div class="menu-item-price">Rp ${item.price.toLocaleString('id-ID')}</div>
-                    <div class="menu-item-quantity">
-                        <button class="quantity-btn" onclick="decreaseQuantity('${item.id}')" ${quantity === 0 ? 'style="opacity: 0.5; cursor: not-allowed;"' : ''}>-</button>
-                        <span class="quantity-display" id="qty-${item.id}">${quantity}</span>
-                        <button class="quantity-btn" onclick="increaseQuantity('${item.id}')">+</button>
+                    <div class="menu-item-image">
+                        ${imageUrl ? `<img src="${imageUrl}" alt="${item.name}" onerror="handleImageError(this)">` : '<div class="image-placeholder">🍽️</div>'}
+                    </div>
+                    <div class="menu-item-content">
+                        <div class="menu-item-name">${item.name}</div>
+                        ${descriptionHTML}
+                        <div class="menu-item-price">Rp ${item.price.toLocaleString('id-ID')}</div>
+                        <div class="menu-item-quantity">
+                            <button class="quantity-btn" onclick="decreaseQuantity('${item.id}')" ${quantity === 0 ? 'style="opacity: 0.5; cursor: not-allowed;"' : ''}>-</button>
+                            <span class="quantity-display" id="qty-${item.id}">${quantity}</span>
+                            <button class="quantity-btn" onclick="increaseQuantity('${item.id}')">+</button>
+                        </div>
                     </div>
                 </div>
             `;
             
             return col;
+        }
+
+        /**
+         * Menangani error saat gambar gagal dimuat
+         * @param {HTMLImageElement} img - Elemen gambar yang error
+         */
+        function handleImageError(img) {
+            // Sembunyikan gambar dan tampilkan placeholder
+            img.style.display = 'none';
+            const imageContainer = img.parentElement;
+            if (!imageContainer.querySelector('.image-placeholder')) {
+                const placeholder = document.createElement('div');
+                placeholder.className = 'image-placeholder';
+                placeholder.textContent = '🍽️';
+                imageContainer.appendChild(placeholder);
+            }
         }
         
         /**
@@ -1010,7 +1273,7 @@
          */
         function updateMenuDisplay() {
             // Update semua menu items
-            const allItems = [...menuData.foods, ...menuData.drinks];
+            const allItems = [...menuData.foods];
             allItems.forEach(item => {
                 const quantity = selectedMenu[item.id]?.quantity || 0;
                 const menuItemElement = document.querySelector(`.menu-item[data-id="${item.id}"]`);
@@ -1080,7 +1343,7 @@
             itemsList.innerHTML = '';
             let totalPrice = 0;
             
-            const allItems = [...menuData.foods, ...menuData.drinks];
+            const allItems = [...menuData.foods];
             allItems.forEach(item => {
                 const quantity = selectedMenu[item.id]?.quantity || 0;
                 if (quantity > 0) {
@@ -1131,7 +1394,7 @@
             locationMenuList.innerHTML = '';
             let totalPrice = 0;
             
-            const allItems = [...menuData.foods, ...menuData.drinks];
+            const allItems = [...menuData.foods];
             allItems.forEach(item => {
                 const quantity = selectedMenu[item.id]?.quantity || 0;
                 if (quantity > 0) {
@@ -1167,7 +1430,7 @@
             const ongkirText = document.getElementById('ongkir').textContent;
             
             // Hitung total menu
-            const allItems = [...menuData.foods, ...menuData.drinks];
+            const allItems = [...menuData.foods];
             let totalMenuPrice = 0;
             allItems.forEach(item => {
                 const quantity = selectedMenu[item.id]?.quantity || 0;
@@ -1623,7 +1886,7 @@
                     let pesanWA = `Halo, saya ingin memesan makanan.\n\n`;
                     
                     // Tambahkan detail menu yang dipilih
-                    const allItems = [...menuData.foods, ...menuData.drinks];
+                    const allItems = [...menuData.foods];
                     let menuItems = [];
                     let totalMenuPrice = 0;
                     
@@ -1880,6 +2143,7 @@
          */
         window.addEventListener('DOMContentLoaded', () => {
             initMap();  // Inisialisasi peta
+            populateFilterDropdown();  // Populate dropdown filter
             renderMenu();  // Render menu items
         });
     </script>
