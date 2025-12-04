@@ -881,7 +881,7 @@
                             <input type="text" 
                                    class="form-control mb-3 input-box" 
                                    id="customer_coordinates" 
-                                   placeholder="Contoh: -6.251627, 107.246045"
+                                   placeholder="'Gunakan Lokasi saya' dibawah ini"
                                    onkeypress="handleCoordinateInput(event)">
                             <button class="btn btn-primary w-100 mb-3" onclick="setLocationByGeolocation()">
                                 <i class="fas fa-location-arrow"></i>
@@ -935,13 +935,13 @@
                             
                             <div class="mt-3" id="noteSection" style="display: none;">
                                 <label for="customer_note" class="form-label" style="color: var(--text-primary); font-weight: 500; margin-bottom: 0.5rem;">
-                                    <i class="fas fa-sticky-note"></i> Mau pesan apa?
+                                    <i class="fas fa-sticky-note"></i> Ada Tambahan?
                                 </label>
                                 <textarea 
                                     class="form-control input-box" 
                                     id="customer_note" 
                                     rows="3"
-                                    placeholder="Contoh: Saya mau pesan makanan"
+                                    placeholder="Contoh: tambahan saus cabai"
                                     style="resize: vertical; min-height: 80px;"></textarea>
                                 <small class="text-muted" style="color: var(--text-secondary); font-size: 0.85rem;">
                                     <i class="fas fa-info-circle"></i> Opsional: Tambahkan catatan atau request khusus untuk pesanan Anda
