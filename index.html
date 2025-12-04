@@ -82,6 +82,136 @@
             color: var(--primary-color) !important;
         }
 
+        .navbar-toggler {
+            border-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .navbar-toggler:focus {
+            box-shadow: 0 0 0 0.25rem rgba(0, 230, 230, 0.25);
+        }
+
+        .navbar-toggler-icon {
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba%28255, 255, 255, 0.85%29' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
+        }
+
+        /* ============================================
+           JAM OPERASIONAL - REAL-TIME CLOCK & CLOSED HOURS
+           Fitur untuk menampilkan jam Jakarta dan membatasi akses
+           berdasarkan jam operasional (07:00 - 17:00 WIB)
+           ============================================ */
+        
+        /* Real-time Clock in Navbar */
+        .navbar-clock {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--text-primary);
+            font-size: 0.9rem;
+            margin-right: 1rem;
+        }
+
+        .navbar-clock i {
+            color: var(--primary-color);
+        }
+
+        .navbar-clock-time {
+            font-family: 'Courier New', monospace;
+            font-weight: 600;
+            color: var(--primary-color);
+        }
+
+        @media (max-width: 991px) {
+            .navbar-clock {
+                margin-right: 0;
+                margin-top: 0.5rem;
+                justify-content: center;
+                width: 100%;
+            }
+        }
+
+        /* Closed Hours Message */
+        .closed-hours-container {
+            display: none;
+            flex: 1;
+            padding: 2rem 0;
+            margin-top: 70px;
+            min-height: calc(100vh - 70px);
+            align-items: center;
+            justify-content: center;
+        }
+
+        .closed-hours-card {
+            background-color: var(--bg-card);
+            border-radius: 20px;
+            padding: 3rem 2rem;
+            text-align: center;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .closed-hours-icon {
+            font-size: 5rem;
+            color: var(--primary-color);
+            margin-bottom: 1.5rem;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.6;
+            }
+        }
+
+        .closed-hours-title {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+        }
+
+        .closed-hours-text {
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+            line-height: 1.8;
+            margin-bottom: 1.5rem;
+        }
+
+        .current-time-display {
+            background: linear-gradient(135deg, rgba(0, 230, 230, 0.1) 0%, rgba(0, 179, 179, 0.05) 100%);
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin-top: 1.5rem;
+            border: 1px solid rgba(0, 230, 230, 0.2);
+        }
+
+        .current-time-label {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .current-time-value {
+            color: var(--primary-color);
+            font-size: 1.5rem;
+            font-weight: 600;
+            font-family: 'Courier New', monospace;
+        }
+
+        .operational-hours {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            margin-top: 1rem;
+        }
+
+        .operational-hours strong {
+            color: var(--primary-color);
+        }
+
         /* Main Content */
         .main-content {
             flex: 1;
@@ -741,6 +871,246 @@
             color: var(--text-secondary);
             font-size: 0.85rem;
         }
+
+        /* Modal Detail Makanan */
+        .food-detail-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .food-detail-modal.active {
+            display: flex;
+        }
+
+        .food-detail-modal-content {
+            background-color: var(--bg-card);
+            border-radius: 20px;
+            max-width: 600px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(0, 230, 230, 0.2);
+            position: relative;
+            animation: slideUp 0.3s ease;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .food-detail-close {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background-color: rgba(255, 255, 255, 0.1);
+            border: none;
+            color: var(--text-primary);
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            transition: all 0.3s ease;
+            z-index: 10;
+        }
+
+        .food-detail-close:hover {
+            background-color: rgba(255, 68, 68, 0.2);
+            color: #ff4444;
+            transform: rotate(90deg);
+        }
+
+        .food-detail-image {
+            width: 100%;
+            height: 300px;
+            overflow: hidden;
+            border-radius: 20px 20px 0 0;
+            background: linear-gradient(135deg, var(--bg-card) 0%, var(--bg-input) 100%);
+        }
+
+        .food-detail-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .food-detail-image .image-placeholder {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 5rem;
+            color: var(--text-secondary);
+            opacity: 0.4;
+        }
+
+        .food-detail-body {
+            padding: 2rem;
+        }
+
+        .food-detail-name {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+        }
+
+        .food-detail-price {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: 1.5rem;
+        }
+
+        .food-detail-description {
+            margin-bottom: 2rem;
+        }
+
+        .food-detail-description-label {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .food-detail-description-label i {
+            color: var(--primary-color);
+        }
+
+        .food-detail-description-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 0.75rem;
+        }
+
+        .food-detail-description-list li {
+            background: linear-gradient(135deg, rgba(0, 230, 230, 0.1) 0%, rgba(0, 179, 179, 0.05) 100%);
+            padding: 0.75rem 1rem;
+            border-radius: 10px;
+            color: var(--text-secondary);
+            border: 1px solid rgba(0, 230, 230, 0.2);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .food-detail-description-list li::before {
+            content: '✓';
+            color: var(--primary-color);
+            font-weight: 700;
+        }
+
+        .food-detail-actions {
+            display: flex;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
+        .food-detail-quantity {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            flex: 1;
+            justify-content: center;
+            background: linear-gradient(135deg, rgba(0, 230, 230, 0.1) 0%, rgba(0, 179, 179, 0.05) 100%);
+            padding: 1rem;
+            border-radius: 15px;
+            border: 1px solid rgba(0, 230, 230, 0.2);
+        }
+
+        .food-detail-quantity-btn {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 1.2rem;
+            font-weight: 700;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .food-detail-quantity-btn:hover {
+            background-color: var(--primary-hover);
+            transform: scale(1.1);
+        }
+
+        .food-detail-quantity-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .food-detail-quantity-display {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            min-width: 50px;
+            text-align: center;
+        }
+
+        @media (max-width: 768px) {
+            .food-detail-modal-content {
+                max-width: 100%;
+                max-height: 95vh;
+            }
+
+            .food-detail-image {
+                height: 250px;
+            }
+
+            .food-detail-body {
+                padding: 1.5rem;
+            }
+
+            .food-detail-name {
+                font-size: 1.5rem;
+            }
+
+            .food-detail-price {
+                font-size: 1.5rem;
+            }
+
+            .food-detail-description-list {
+                grid-template-columns: 1fr;
+            }
+
+            .food-detail-actions {
+                flex-direction: column;
+            }
+        }
     </style>
 </head>
 
@@ -756,6 +1126,12 @@
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
+                <!-- Jam Real-time Jakarta (WIB) - Menampilkan waktu Jakarta saat ini -->
+                <div class="navbar-clock">
+                    <i class="fas fa-clock"></i>
+                    <span>WIB:</span>
+                    <span class="navbar-clock-time" id="jakartaTime">--:--:--</span>
+                </div>
                 <ul class="navbar-nav ms-auto">
                     <li class="nav-item">
                         <a class="nav-link active" href="index.html">
@@ -775,8 +1151,60 @@
     <!-- Toast Container -->
     <div class="toast-container"></div>
 
+    <!-- ============================================
+         CLOSED HOURS MESSAGE - JAM OPERASIONAL
+         Pesan yang ditampilkan ketika toko tutup (di luar jam 07:00 - 17:00 WIB)
+         ============================================ -->
+    <div class="closed-hours-container" id="closedHoursContainer">
+        <div class="container">
+            <div class="closed-hours-card">
+                <div class="closed-hours-icon">
+                    <i class="fas fa-clock"></i>
+                </div>
+                <h2 class="closed-hours-title">Maaf Sedang Tutup</h2>
+                <p class="closed-hours-text">
+                    Maaf, kami hanya melayani pesanan dari jam <strong>07:00 - 17:00 WIB</strong>.
+                    Silakan kembali pada jam operasional kami.
+                </p>
+                <div class="current-time-display">
+                    <div class="current-time-label">Waktu Jakarta Saat Ini:</div>
+                    <div class="current-time-value" id="closedHoursTime">--:--:--</div>
+                    <div class="operational-hours">
+                        Jam Operasional: <strong>07:00 - 17:00 WIB</strong>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Detail Makanan -->
+    <div class="food-detail-modal" id="foodDetailModal">
+        <div class="food-detail-modal-content">
+            <button class="food-detail-close" onclick="closeFoodDetail()">
+                <i class="fas fa-times"></i>
+            </button>
+            <div class="food-detail-image" id="foodDetailImage">
+                <!-- Gambar akan diisi oleh JavaScript -->
+            </div>
+            <div class="food-detail-body">
+                <h2 class="food-detail-name" id="foodDetailName"></h2>
+                <div class="food-detail-price" id="foodDetailPrice"></div>
+                <div class="food-detail-description" id="foodDetailDescription">
+                    <!-- Deskripsi akan diisi oleh JavaScript -->
+                </div>
+                <div class="food-detail-actions">
+                    <div class="food-detail-quantity">
+                        <button class="food-detail-quantity-btn" id="foodDetailDecrease" onclick="decreaseQuantityFromModal()">-</button>
+                        <span class="food-detail-quantity-display" id="foodDetailQuantity">0</span>
+                        <button class="food-detail-quantity-btn" id="foodDetailIncrease" onclick="increaseQuantityFromModal()">+</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Main Content -->
-    <div class="main-content">
+    <div class="main-content" id="mainContent">
         <div class="container">
             
             <!-- Hero Section -->
@@ -1064,6 +1492,15 @@
             lng: 107.246045   // Longitude restoran
         };
 
+        // ============================================
+        // JAM OPERASIONAL - KONFIGURASI
+        // Set jam buka dan tutup toko (WIB - UTC+7)
+        // ============================================
+        const OPERATING_HOURS = {
+            open: 7,   // Jam 7 pagi
+            close: 17  // Jam 5 sore
+        };
+
         // Data Menu
         const menuData = {
             foods: [
@@ -1117,6 +1554,9 @@
         
         // Menyimpan makanan yang sudah difilter
         let filteredFoods = [...menuData.foods];
+
+        // Menyimpan item yang sedang ditampilkan di modal
+        let currentModalItemId = null;
 
         // ============================================
         // FUNGSI MENU - RENDER DAN HANDLING
@@ -1206,7 +1646,7 @@
             }
             
             col.innerHTML = `
-                <div class="menu-item ${isSelected ? 'selected' : ''}" data-id="${item.id}">
+                <div class="menu-item ${isSelected ? 'selected' : ''}" data-id="${item.id}" onclick="showFoodDetail('${item.id}')">
                     <div class="menu-item-image">
                         ${imageUrl ? `<img src="${imageUrl}" alt="${item.name}" onerror="handleImageError(this)">` : '<div class="image-placeholder">🍽️</div>'}
                     </div>
@@ -1214,7 +1654,7 @@
                         <div class="menu-item-name">${item.name}</div>
                         ${descriptionHTML}
                         <div class="menu-item-price">Rp ${item.price.toLocaleString('id-ID')}</div>
-                        <div class="menu-item-quantity">
+                        <div class="menu-item-quantity" onclick="event.stopPropagation()">
                             <button class="quantity-btn" onclick="decreaseQuantity('${item.id}')" ${quantity === 0 ? 'style="opacity: 0.5; cursor: not-allowed;"' : ''}>-</button>
                             <span class="quantity-display" id="qty-${item.id}">${quantity}</span>
                             <button class="quantity-btn" onclick="increaseQuantity('${item.id}')">+</button>
@@ -1309,6 +1749,9 @@
                     }
                 }
             });
+
+            // Update quantity di modal jika modal sedang terbuka
+            updateModalQuantity();
         }
         
         /**
@@ -1323,6 +1766,131 @@
                 updateLocationMenuDisplay();
                 updateTotalPayment();
                 showToast('Item berhasil dihapus dari pesanan', 'success');
+            }
+        }
+
+        // ============================================
+        // FUNGSI MODAL DETAIL MAKANAN
+        // ============================================
+
+        /**
+         * Menampilkan modal detail makanan
+         * @param {string} itemId - ID item menu yang akan ditampilkan
+         */
+        function showFoodDetail(itemId) {
+            const item = menuData.foods.find(food => food.id === itemId);
+            if (!item) return;
+
+            currentModalItemId = itemId;
+            const modal = document.getElementById('foodDetailModal');
+            const imageContainer = document.getElementById('foodDetailImage');
+            const nameElement = document.getElementById('foodDetailName');
+            const priceElement = document.getElementById('foodDetailPrice');
+            const descriptionElement = document.getElementById('foodDetailDescription');
+            const quantityElement = document.getElementById('foodDetailQuantity');
+            const decreaseBtn = document.getElementById('foodDetailDecrease');
+            const increaseBtn = document.getElementById('foodDetailIncrease');
+
+            // Set nama
+            nameElement.textContent = item.name;
+
+            // Set harga
+            priceElement.textContent = `Rp ${item.price.toLocaleString('id-ID')}`;
+
+            // Set gambar
+            if (item.image) {
+                imageContainer.innerHTML = `<img src="${item.image}" alt="${item.name}" onerror="this.parentElement.innerHTML='<div class=\\'image-placeholder\\'>🍽️</div>'">`;
+            } else {
+                imageContainer.innerHTML = '<div class="image-placeholder">🍽️</div>';
+            }
+
+            // Set deskripsi
+            if (item.description && item.description.length > 0) {
+                descriptionElement.innerHTML = `
+                    <div class="food-detail-description-label">
+                        <i class="fas fa-list"></i>
+                        <span>Isi Makanan:</span>
+                    </div>
+                    <ul class="food-detail-description-list">
+                        ${item.description.map(desc => `<li>${desc}</li>`).join('')}
+                    </ul>
+                `;
+            } else {
+                descriptionElement.innerHTML = '<p style="color: var(--text-secondary);">Tidak ada deskripsi tersedia.</p>';
+            }
+
+            // Set quantity
+            const quantity = selectedMenu[itemId]?.quantity || 0;
+            quantityElement.textContent = quantity;
+            updateModalQuantityButtons(quantity, decreaseBtn, increaseBtn);
+
+            // Tampilkan modal
+            modal.classList.add('active');
+            document.body.style.overflow = 'hidden'; // Prevent background scroll
+        }
+
+        /**
+         * Menutup modal detail makanan
+         */
+        function closeFoodDetail() {
+            const modal = document.getElementById('foodDetailModal');
+            modal.classList.remove('active');
+            document.body.style.overflow = ''; // Restore scroll
+            currentModalItemId = null;
+        }
+
+        /**
+         * Update tombol quantity di modal
+         */
+        function updateModalQuantityButtons(quantity, decreaseBtn, increaseBtn) {
+            if (quantity === 0) {
+                decreaseBtn.disabled = true;
+            } else {
+                decreaseBtn.disabled = false;
+            }
+        }
+
+        /**
+         * Meningkatkan quantity dari modal
+         */
+        function increaseQuantityFromModal() {
+            if (!currentModalItemId) return;
+            increaseQuantity(currentModalItemId);
+            const quantity = selectedMenu[currentModalItemId]?.quantity || 0;
+            document.getElementById('foodDetailQuantity').textContent = quantity;
+            const decreaseBtn = document.getElementById('foodDetailDecrease');
+            const increaseBtn = document.getElementById('foodDetailIncrease');
+            updateModalQuantityButtons(quantity, decreaseBtn, increaseBtn);
+        }
+
+        /**
+         * Mengurangi quantity dari modal
+         */
+        function decreaseQuantityFromModal() {
+            if (!currentModalItemId) return;
+            decreaseQuantity(currentModalItemId);
+            const quantity = selectedMenu[currentModalItemId]?.quantity || 0;
+            document.getElementById('foodDetailQuantity').textContent = quantity;
+            const decreaseBtn = document.getElementById('foodDetailDecrease');
+            const increaseBtn = document.getElementById('foodDetailIncrease');
+            updateModalQuantityButtons(quantity, decreaseBtn, increaseBtn);
+        }
+
+        /**
+         * Update quantity di modal jika ada perubahan dari luar modal
+         */
+        function updateModalQuantity() {
+            if (currentModalItemId) {
+                const quantity = selectedMenu[currentModalItemId]?.quantity || 0;
+                const quantityElement = document.getElementById('foodDetailQuantity');
+                if (quantityElement) {
+                    quantityElement.textContent = quantity;
+                }
+                const decreaseBtn = document.getElementById('foodDetailDecrease');
+                const increaseBtn = document.getElementById('foodDetailIncrease');
+                if (decreaseBtn && increaseBtn) {
+                    updateModalQuantityButtons(quantity, decreaseBtn, increaseBtn);
+                }
             }
         }
         
@@ -2144,14 +2712,147 @@
         // INISIALISASI SAAT HALAMAN DIMUAT
         // ============================================
         
+        // ============================================
+        // FUNGSI JAM OPERASIONAL JAKARTA
+        // Fitur untuk menampilkan jam real-time Jakarta dan
+        // membatasi akses berdasarkan jam operasional
+        // ============================================
+
+        /**
+         * Mendapatkan waktu Jakarta (WIB - UTC+7)
+         * Fungsi ini mengkonversi waktu lokal ke waktu Jakarta
+         * @returns {Date} Objek Date dengan waktu Jakarta
+         */
+        function getJakartaTime() {
+            const now = new Date();
+            // Jakarta adalah UTC+7
+            const utc = now.getTime() + (now.getTimezoneOffset() * 60000);
+            const jakartaTime = new Date(utc + (7 * 3600000));
+            return jakartaTime;
+        }
+
+        /**
+         * Memformat waktu menjadi string HH:MM:SS
+         * @param {Date} date - Objek Date
+         * @returns {string} String waktu dalam format HH:MM:SS
+         */
+        function formatTime(date) {
+            const hours = String(date.getHours()).padStart(2, '0');
+            const minutes = String(date.getMinutes()).padStart(2, '0');
+            const seconds = String(date.getSeconds()).padStart(2, '0');
+            return `${hours}:${minutes}:${seconds}`;
+        }
+
+        /**
+         * Mengecek apakah saat ini dalam jam operasional
+         * Menggunakan OPERATING_HOURS.open (7) dan OPERATING_HOURS.close (17)
+         * @returns {boolean} true jika dalam jam operasional (07:00 - 17:00), false jika tidak
+         */
+        function isOperatingHours() {
+            const jakartaTime = getJakartaTime();
+            const currentHour = jakartaTime.getHours();
+            return currentHour >= OPERATING_HOURS.open && currentHour < OPERATING_HOURS.close;
+        }
+
+        /**
+         * Update tampilan jam real-time Jakarta
+         * Update jam di navbar dan di pesan closed hours setiap detik
+         */
+        function updateJakartaTime() {
+            const jakartaTime = getJakartaTime();
+            const timeString = formatTime(jakartaTime);
+            
+            // Update jam di navbar
+            const navbarTimeElement = document.getElementById('jakartaTime');
+            if (navbarTimeElement) {
+                navbarTimeElement.textContent = timeString;
+            }
+            
+            // Update jam di closed hours message
+            const closedHoursTimeElement = document.getElementById('closedHoursTime');
+            if (closedHoursTimeElement) {
+                closedHoursTimeElement.textContent = timeString;
+            }
+        }
+
+        /**
+         * Mengatur tampilan berdasarkan jam operasional
+         * Menampilkan/menyembunyikan konten utama dan pesan tutup
+         */
+        function checkOperatingHours() {
+            const isOpen = isOperatingHours();
+            const mainContent = document.getElementById('mainContent');
+            const closedHoursContainer = document.getElementById('closedHoursContainer');
+            
+            if (isOpen) {
+                // Toko buka - tampilkan konten utama
+                if (mainContent) {
+                    mainContent.style.display = 'block';
+                }
+                if (closedHoursContainer) {
+                    closedHoursContainer.style.display = 'none';
+                }
+            } else {
+                // Toko tutup - tampilkan pesan tutup
+                if (mainContent) {
+                    mainContent.style.display = 'none';
+                }
+                if (closedHoursContainer) {
+                    closedHoursContainer.style.display = 'flex';
+                }
+            }
+        }
+
+        /**
+         * Inisialisasi jam real-time dan pengecekan jam operasional
+         * Dipanggil saat halaman dimuat untuk memulai update jam dan pengecekan
+         */
+        function initOperatingHours() {
+            // Update jam setiap detik
+            updateJakartaTime();
+            setInterval(updateJakartaTime, 1000);
+            
+            // Cek jam operasional setiap detik (untuk handle transisi buka/tutup)
+            checkOperatingHours();
+            setInterval(checkOperatingHours, 1000);
+        }
+
         /**
          * Event listener untuk inisialisasi peta saat halaman selesai dimuat
          * Dipanggil sekali saat DOM sudah siap
+         * 
+         * CATATAN: Inisialisasi jam operasional selalu dijalankan untuk menampilkan jam real-time
+         * Peta dan menu hanya diinisialisasi jika dalam jam operasional
          */
         window.addEventListener('DOMContentLoaded', () => {
-            initMap();  // Inisialisasi peta
-            populateFilterDropdown();  // Populate dropdown filter
-            renderMenu();  // Render menu items
+            // Inisialisasi jam operasional terlebih dahulu (selalu dijalankan)
+            // Ini akan menampilkan jam real-time di navbar dan mengecek jam operasional
+            initOperatingHours();
+            
+            // Hanya inisialisasi peta dan menu jika dalam jam operasional
+            // Ini menghemat resource saat toko tutup
+            if (isOperatingHours()) {
+                initMap();  // Inisialisasi peta
+                populateFilterDropdown();  // Populate dropdown filter
+                renderMenu();  // Render menu items
+            }
+            
+            // Event listener untuk menutup modal saat klik di luar modal
+            const modal = document.getElementById('foodDetailModal');
+            if (modal) {
+                modal.addEventListener('click', (e) => {
+                    if (e.target === modal) {
+                        closeFoodDetail();
+                    }
+                });
+            }
+
+            // Event listener untuk menutup modal dengan tombol ESC
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape' && currentModalItemId) {
+                    closeFoodDetail();
+                }
+            });
         });
     </script>
 </body>

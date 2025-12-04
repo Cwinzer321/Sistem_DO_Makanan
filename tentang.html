@@ -234,42 +234,64 @@
         /* Steps Section */
         .steps-container {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 1.5rem;
-            margin-top: 1.5rem;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
         }
 
         .step-card {
             background: linear-gradient(135deg, rgba(0, 230, 230, 0.1) 0%, rgba(0, 179, 179, 0.05) 100%);
-            border-radius: 15px;
-            padding: 1.5rem;
+            border-radius: 20px;
+            padding: 2rem 1.5rem;
             border: 1px solid rgba(0, 230, 230, 0.2);
             text-align: center;
             transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 280px;
+            position: relative;
         }
 
         .step-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 8px 24px rgba(0, 230, 230, 0.2);
+            transform: translateY(-8px);
+            box-shadow: 0 12px 32px rgba(0, 230, 230, 0.3);
+            border-color: rgba(0, 230, 230, 0.4);
         }
 
         .step-number {
             background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-hover) 100%);
             color: white;
-            width: 50px;
-            height: 50px;
+            width: 60px;
+            height: 60px;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 1.5rem;
+            font-size: 1.8rem;
             font-weight: 700;
-            margin: 0 auto 1rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 4px 15px rgba(0, 230, 230, 0.3);
         }
 
         .step-text {
             color: var(--text-secondary);
-            line-height: 1.6;
+            line-height: 1.8;
+            margin: 0;
+        }
+
+        .step-text strong {
+            color: var(--text-primary);
+            font-weight: 600;
+            display: block;
+            margin-bottom: 0.5rem;
+            font-size: 1.1rem;
+        }
+
+        .step-text span {
+            display: block;
+            color: var(--text-secondary);
+            font-size: 0.95rem;
         }
 
         /* Button */
@@ -366,6 +388,27 @@
 
             .steps-container {
                 grid-template-columns: 1fr;
+                gap: 1.5rem;
+            }
+
+            .step-card {
+                min-height: auto;
+                padding: 1.5rem 1rem;
+            }
+
+            .step-number {
+                width: 50px;
+                height: 50px;
+                font-size: 1.5rem;
+                margin-bottom: 1rem;
+            }
+
+            .step-text strong {
+                font-size: 1rem;
+            }
+
+            .step-text span {
+                font-size: 0.9rem;
             }
         }
     </style>
@@ -560,23 +603,38 @@
                     <div class="steps-container">
                         <div class="step-card">
                             <div class="step-number">1</div>
-                            <p class="step-text"><strong>Pilih Menu</strong> - Pelanggan memilih makanan dan minuman yang diinginkan, mengatur quantity, dan melihat summary pesanan dengan total harga.</p>
+                            <div class="step-text">
+                                <strong>Pilih Menu</strong>
+                                <span>Gunakan filter dropdown untuk mencari menu tertentu, atau pilih langsung dari daftar menu. Atur jumlah pesanan dengan tombol +/- dan lihat summary pesanan dengan total harga secara real-time.</span>
+                            </div>
                         </div>
                         <div class="step-card">
                             <div class="step-number">2</div>
-                            <p class="step-text"><strong>Tentukan Lokasi</strong> - Setelah menu dipilih, pelanggan menentukan lokasi pengiriman melalui peta interaktif, GPS, atau koordinat manual.</p>
+                            <div class="step-text">
+                                <strong>Tentukan Lokasi</strong>
+                                <span>Setelah menu dipilih, klik "Lanjutkan ke Pilih Lokasi". Tentukan lokasi pengiriman melalui peta interaktif, gunakan GPS, atau masukkan koordinat manual.</span>
+                            </div>
                         </div>
                         <div class="step-card">
                             <div class="step-number">3</div>
-                            <p class="step-text"><strong>Hitung Jarak & Ongkir</strong> - Sistem menghitung jarak menggunakan rute jalan sebenarnya dan menghitung ongkos kirim secara otomatis.</p>
+                            <div class="step-text">
+                                <strong>Hitung Jarak & Ongkir</strong>
+                                <span>Sistem secara otomatis menghitung jarak menggunakan rute jalan sebenarnya melalui OSRM routing engine dan menghitung ongkos kirim (Rp 500/km) secara otomatis.</span>
+                            </div>
                         </div>
                         <div class="step-card">
                             <div class="step-number">4</div>
-                            <p class="step-text"><strong>Lihat Total & Rute</strong> - Total pembayaran (menu + ongkir) ditampilkan. Rute pengiriman ditampilkan di peta dengan garis biru yang mengikuti jalan.</p>
+                            <div class="step-text">
+                                <strong>Lihat Total & Rute</strong>
+                                <span>Total pembayaran (menu + ongkir) ditampilkan secara real-time. Rute pengiriman ditampilkan di peta dengan garis biru yang mengikuti jalan sebenarnya. Menu yang dipilih juga ditampilkan untuk referensi.</span>
+                            </div>
                         </div>
                         <div class="step-card">
                             <div class="step-number">5</div>
-                            <p class="step-text"><strong>Kirim ke WhatsApp</strong> - Pelanggan mengirim informasi lengkap pesanan (menu, lokasi, jarak, ongkir, total) ke restoran via WhatsApp untuk konfirmasi.</p>
+                            <div class="step-text">
+                                <strong>Kirim ke WhatsApp</strong>
+                                <span>Tambahkan catatan khusus (opsional), lalu klik "Kirim ke WhatsApp". Informasi lengkap pesanan (menu, lokasi, jarak, ongkir, total) akan dikirim ke restoran untuk konfirmasi.</span>
+                            </div>
                         </div>
                     </div>
                 </div>
