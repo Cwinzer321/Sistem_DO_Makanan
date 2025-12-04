@@ -1,14 +1,21 @@
 # Sistem Delivery Order Makanan
 
-Sistem pemesanan makanan online yang memanfaatkan teknologi peta untuk mempermudah proses pemesanan dan pengiriman. Sistem ini memungkinkan pelanggan untuk memilih menu makanan dan minuman, menentukan lokasi mereka secara langsung di peta, menghitung jarak dari restoran, dan menghitung ongkos kirim secara otomatis.
+Sistem pemesanan makanan online yang memanfaatkan teknologi peta untuk mempermudah proses pemesanan dan pengiriman. Sistem ini memungkinkan pelanggan untuk memilih menu makanan, menentukan lokasi mereka secara langsung di peta, menghitung jarak dari restoran, dan menghitung ongkos kirim secara otomatis.
 
 ## 🎯 Fitur Utama
 
 ### 🍽️ Pilihan Menu Lengkap
-- **5 Jenis Makanan**: Nasi Goreng Spesial, Mie Ayam Bakso, Gado-Gado, Sate Ayam (10 tusuk), Rendang
-- **5 Jenis Minuman**: Es Teh Manis, Es Jeruk, Jus Alpukat, Es Campur, Kopi Susu
+- **6 Jenis Makanan**: 
+  - Kimbab Isi 6 (Rp 15.000)
+  - Ricebowl (Rp 20.000)
+  - Ricebowl + Kimbab (Rp 20.000)
+  - Mac and Cheese (Rp 20.000)
+  - Kimbab Isi 4 (Rp 10.000)
+  - Kimbab Isi 5 (Rp 15.000)
+- **Filter Menu**: Dropdown filter untuk memudahkan pencarian menu berdasarkan nama
 - **Quantity Control**: Tombol +/- untuk mengatur jumlah pesanan dengan mudah
 - **Real-time Summary**: Tampilan summary pesanan yang update secara real-time
+- **Deskripsi Menu**: Setiap menu menampilkan detail isi/komposisi makanan
 
 ### 🛒 Keranjang Belanja Interaktif
 - **Summary Pesanan**: Menampilkan detail item, quantity, dan harga per item
@@ -43,12 +50,13 @@ Sistem pemesanan makanan online yang memanfaatkan teknologi peta untuk mempermud
 ## 🚀 Cara Penggunaan
 
 ### Langkah 1: Pilih Menu
-1. Pilih makanan dan minuman yang diinginkan
-2. Gunakan tombol **+** untuk menambah quantity
-3. Gunakan tombol **-** untuk mengurangi quantity
-4. Lihat summary pesanan di bagian bawah
-5. Gunakan tombol **X** untuk menghapus item jika perlu
-6. Klik **"Lanjutkan ke Pilih Lokasi"** setelah selesai memilih menu
+1. Gunakan dropdown filter untuk mencari menu tertentu (opsional)
+2. Pilih makanan yang diinginkan
+3. Gunakan tombol **+** untuk menambah quantity
+4. Gunakan tombol **-** untuk mengurangi quantity
+5. Lihat summary pesanan di bagian bawah
+6. Gunakan tombol **X** untuk menghapus item jika perlu
+7. Klik **"Lanjutkan ke Pilih Lokasi"** setelah selesai memilih menu
 
 ### Langkah 2: Tentukan Lokasi
 1. Setelah menu dipilih, section lokasi akan muncul
@@ -97,10 +105,7 @@ Sistem pemesanan makanan online yang memanfaatkan teknologi peta untuk mempermud
 
 ## 📦 Instalasi
 
-1. Clone repositori ini ke lokal komputer Anda:
-   ```bash
-   git clone https://github.com/Cwinzer321/gabin.git
-   ```
+1. Download atau clone repositori ini ke lokal komputer Anda
 
 2. Buka folder project:
    ```bash
@@ -148,12 +153,14 @@ Edit menu di file `index.html`:
 ```javascript
 const menuData = {
     foods: [
-        { id: 'food1', name: 'Nasi Goreng Spesial', price: 25000 },
-        // Tambahkan menu makanan lainnya
-    ],
-    drinks: [
-        { id: 'drink1', name: 'Es Teh Manis', price: 5000 },
-        // Tambahkan menu minuman lainnya
+        { 
+            id: 'food1', 
+            name: 'Kimbab Isi 6', 
+            price: 15000, 
+            image: 'img/kimbab15k.jpg',
+            description: ['Nasi', 'Wortel', 'Timun', 'Telur', 'Rumput laut']
+        },
+        // Tambahkan menu makanan lainnya dengan format yang sama
     ]
 };
 ```
