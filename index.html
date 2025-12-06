@@ -1362,6 +1362,16 @@
                             </div>
                             
                             <div class="mt-3" id="noteSection" style="display: none;">
+                                <label for="customer_name" class="form-label" style="color: var(--text-primary); font-weight: 500; margin-bottom: 0.5rem;">
+                                    <i class="fas fa-user"></i> Nama Pembeli
+                                </label>
+                                <input 
+                                    type="text" 
+                                    class="form-control input-box" 
+                                    id="customer_name" 
+                                    placeholder="Masukkan nama Anda"
+                                    style="margin-bottom: 1rem;">
+                                
                                 <label for="customer_note" class="form-label" style="color: var(--text-primary); font-weight: 500; margin-bottom: 0.5rem;">
                                     <i class="fas fa-sticky-note"></i> Ada Tambahan?
                                 </label>
@@ -2417,6 +2427,9 @@
                 document.getElementById("ongkir").innerText = "-";
                 document.getElementById("whatsappButton").style.display = "none";
                 document.getElementById("noteSection").style.display = "none";
+                // Reset field nama dan catatan
+                document.getElementById("customer_name").value = "";
+                document.getElementById("customer_note").value = "";
                 return;  // Keluar dari fungsi, tidak lanjut ke proses berikutnya
             }
 
@@ -2450,6 +2463,9 @@
                         distanceForMessage = distance.toFixed(2) + " km";
                     }
                     
+                    // Ambil nama pembeli dari input
+                    const customerName = document.getElementById("customer_name").value.trim();
+                    
                     // Ambil catatan/request khusus dari input textarea
                     const customerNote = document.getElementById("customer_note").value.trim();
                     
@@ -2459,6 +2475,11 @@
                     
                     // Buat template pesan WhatsApp dengan informasi lengkap
                     let pesanWA = `Halo, saya ingin memesan makanan.\n\n`;
+                    
+                    // Tambahkan nama pembeli jika diisi
+                    if (customerName) {
+                        pesanWA += `👤 *Nama Pembeli:* ${customerName}\n\n`;
+                    }
                     
                     // Tambahkan detail menu yang dipilih
                     const allItems = [...menuData.foods];
@@ -2493,8 +2514,12 @@
                     // Tambahkan instruksi untuk membuka Google Maps
                     pesanWA += `\n\nKlik link di atas untuk melihat lokasi di Google Maps.\n\nTerima kasih!`;
                     
+                    // WA Testing Desi
                     // Encode pesan untuk URL dan buka WhatsApp dengan pesan yang sudah disiapkan
                     const linkWA = `https://wa.me/6285882900757?text=${encodeURIComponent(pesanWA)}`;
+
+                    // WA Testing raihan
+                    // const linkWA = `https://wa.me/6285157204233?text=${encodeURIComponent(pesanWA)}`;
                     window.open(linkWA, "_blank");  // Buka di tab baru
                 };
             }
