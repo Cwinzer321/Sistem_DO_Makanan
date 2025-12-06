@@ -1380,6 +1380,7 @@
                                         <option value="karangsambung">Karangsambung</option>
                                         <option value="kedungwaringin">Kedungwaringin</option>
                                         <option value="waringinjaya">Waringinjaya</option>
+                                        <option value="luar_kecamatan">Di Luar Kecamatan Kedungwaringin</option>
                                     </select>
                                     <small class="text-muted" style="color: var(--text-secondary); font-size: 0.85rem;">
                                         <i class="fas fa-info-circle"></i> Pilih lokasi pengiriman Anda (Wajib)
@@ -1523,8 +1524,8 @@
         
         // Koordinat lokasi restoran (default location)
         const restoLatLng = {
-            lat: -6.251627,   // Latitude restoran
-            lng: 107.246045   // Longitude restoran
+            lat: -6.251116,   // Latitude restoran
+            lng: 107.246671   // Longitude restoran
         };
 
         // ============================================
@@ -2156,13 +2157,73 @@
          */
         function initMap() {
             // Inisialisasi peta dengan koordinat restoran dan zoom level 15
+            // Tambahkan background color agar tidak abu-abu saat loading
+            const mapContainer = document.getElementById('map');
+            if (mapContainer) {
+                mapContainer.style.backgroundColor = '#e8f4f8'; // Warna biru muda sebagai placeholder
+            }
+            
             map = L.map('map').setView([restoLatLng.lat, restoLatLng.lng], 15);
             
-            // Menambahkan tile layer dari OpenStreetMap sebagai background peta
-            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-                maxZoom: 19  // Maksimal zoom level
-            }).addTo(map);
+            // Menambahkan loading indicator
+            const loadingDiv = document.createElement('div');
+            loadingDiv.id = 'map-loading';
+            loadingDiv.style.cssText = 'position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 1000; background: rgba(255,255,255,0.95); padding: 15px 25px; border-radius: 10px; text-align: center; box-shadow: 0 2px 10px rgba(0,0,0,0.2);';
+            loadingDiv.innerHTML = '<div class="spinner-border text-primary" role="status" style="width: 2rem; height: 2rem;"></div><p style="margin-top: 10px; margin-bottom: 0; color: #333; font-size: 14px;">Memuat peta...</p>';
+            mapContainer.appendChild(loadingDiv);
+            
+            // Gunakan tile layer yang lebih cepat - CartoDB biasanya lebih cepat dari OSM
+            const tileLayer = L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
+                subdomains: 'abcd',
+                maxZoom: 19,
+                minZoom: 1,
+                // Retry options untuk tile yang gagal load
+                crossOrigin: true,
+                errorTileUrl: 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7'
+            });
+            
+            // Tambahkan tile layer ke map
+            tileLayer.addTo(map);
+            
+            // Hapus loading indicator setelah tile pertama dimuat
+            tileLayer.on('load', function() {
+                const loadingEl = document.getElementById('map-loading');
+                if (loadingEl) {
+                    loadingEl.style.transition = 'opacity 0.3s';
+                    loadingEl.style.opacity = '0';
+                    setTimeout(() => {
+                        loadingEl.remove();
+                        if (mapContainer) {
+                            mapContainer.style.backgroundColor = '';
+                        }
+                    }, 300);
+                }
+            });
+            
+            // Fallback: jika setelah 5 detik masih loading, hapus loading indicator dan coba OSM
+            setTimeout(() => {
+                const loadingEl = document.getElementById('map-loading');
+                if (loadingEl) {
+                    // Coba gunakan OSM sebagai fallback
+                    map.removeLayer(tileLayer);
+                    const osmLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+                        maxZoom: 19,
+                        crossOrigin: true
+                    });
+                    osmLayer.addTo(map);
+                    
+                    loadingEl.style.transition = 'opacity 0.3s';
+                    loadingEl.style.opacity = '0';
+                    setTimeout(() => {
+                        loadingEl.remove();
+                        if (mapContainer) {
+                            mapContainer.style.backgroundColor = '';
+                        }
+                    }, 300);
+                }
+            }, 5000);
 
             // Membuat custom icon untuk marker restoran dengan garis vertikal di bawahnya
             const restoIcon = L.divIcon({
@@ -2508,17 +2569,12 @@
          * @returns {number} - Ongkos kirim dalam rupiah
          */
         function calculateOngkirByDistance(distance) {
-            if (distance <= 2) {
-                // Jarak <= 2 km: ongkir 3000
+            if (distance <= 2.3) {
+                // Jarak <= 2,3 km: ongkir 3000
                 return 3000;
-            } else if (distance <= 4) {
-                // Jarak > 2 km dan <= 4 km: ongkir 3000-5000 (random atau bisa 4000)
-                return Math.floor(Math.random() * (5000 - 3000 + 1)) + 3000;
             } else {
-                // Jarak > 4 km: ongkir 5000 atau lebih
-                // Untuk jarak > 4 km, tambahkan 500 per km tambahan
-                const tambahanKm = Math.ceil(distance - 4);
-                return 5000 + (tambahanKm * 500);
+                // Jarak > 2,3 km: ongkir 5000
+                return 5000;
             }
         }
 
@@ -2672,6 +2728,12 @@
                     // Untuk desa berbayar, hitung ongkir berdasarkan jarak
                     selectedOngkir = calculateOngkirByDistance(distance);
                     document.getElementById("ongkir").innerText = `Rp ${selectedOngkir.toLocaleString("id-ID")}`;
+                } else if (selectedLokasi === "luar_kecamatan") {
+                    // Untuk luar kecamatan, ongkir lebih dari 5000 (6000-10000)
+                    const minOngkir = 6000;
+                    const maxOngkir = 10000;
+                    selectedOngkir = Math.floor(Math.random() * (maxOngkir - minOngkir + 1)) + minOngkir;
+                    document.getElementById("ongkir").innerText = `Rp ${selectedOngkir.toLocaleString("id-ID")}`;
                 }
                 
                 updateTotalPayment();
@@ -2799,10 +2861,10 @@
                 
                 // WA Testing Desi
                 // Encode pesan untuk URL dan buka WhatsApp dengan pesan yang sudah disiapkan
-                 const linkWA = `https://wa.me/6285882900757?text=${encodeURIComponent(pesanWA)}`;
+                //  const linkWA = `https://wa.me/6285882900757?text=${encodeURIComponent(pesanWA)}`;
 
                 // WA Testing raihan
-                // const linkWA = `https://wa.me/6285157204233?text=${encodeURIComponent(pesanWA)}`;
+                 const linkWA = `https://wa.me/6285157204233?text=${encodeURIComponent(pesanWA)}`;
                 window.open(linkWA, "_blank");  // Buka di tab baru
             };
         }
