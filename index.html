@@ -1387,13 +1387,14 @@
                                 </div>
                                 
                                 <label for="customer_name" class="form-label" style="color: var(--text-primary); font-weight: 500; margin-bottom: 0.5rem;">
-                                    <i class="fas fa-user"></i> Nama Pembeli
+                                    <i class="fas fa-user"></i> Nama Pembeli <span style="color: #dc3545;">*</span>
                                 </label>
                                 <input 
                                     type="text" 
                                     class="form-control input-box" 
                                     id="customer_name" 
                                     placeholder="Masukkan nama Anda"
+                                    required
                                     style="margin-bottom: 1rem;">
                                 
                                 <label for="customer_note" class="form-label" style="color: var(--text-primary); font-weight: 500; margin-bottom: 0.5rem;">
@@ -2308,12 +2309,49 @@
                     .bindPopup("<strong>📍 Lokasi Anda</strong>");
             }
 
-            // Sesuaikan view peta agar kedua marker (restoran dan pelanggan) terlihat
-            const group = new L.featureGroup([restoMarker, customerMarker]);
-            map.fitBounds(group.getBounds().pad(0.1));  // pad(0.1) menambahkan padding 10% di sekeliling
-
             // Update nilai input koordinat dengan format 6 desimal
             document.getElementById("customer_coordinates").value = `${latLng.lat.toFixed(6)}, ${latLng.lng.toFixed(6)}`;
+            
+            // Hitung jarak langsung untuk menentukan zoom level yang tepat
+            const directDistance = calculateDistance(restoLatLng.lat, restoLatLng.lng, latLng.lat, latLng.lng);
+            
+            // Sesuaikan view peta agar kedua marker (restoran dan pelanggan) terlihat
+            // Gunakan setTimeout untuk memastikan marker sudah benar-benar ditambahkan ke map
+            setTimeout(() => {
+                const group = new L.featureGroup([restoMarker, customerMarker]);
+                const bounds = group.getBounds();
+                const center = bounds.getCenter();
+                
+                // Tentukan zoom level berdasarkan jarak - semakin dekat semakin tinggi zoom
+                let zoomLevel;
+                if (directDistance < 0.5) {
+                    // Jarak sangat dekat (< 500m), zoom sangat dekat
+                    zoomLevel = 16;
+                } else if (directDistance < 1) {
+                    // Jarak dekat (< 1 km), zoom dekat
+                    zoomLevel = 15;
+                } else if (directDistance < 3) {
+                    // Jarak sedang (1-3 km), zoom sedang-dekat
+                    zoomLevel = 14;
+                } else if (directDistance < 5) {
+                    // Jarak agak jauh (3-5 km), zoom sedang
+                    zoomLevel = 13;
+                } else {
+                    // Jarak jauh (> 5 km), zoom agak jauh tapi tetap terlihat jelas
+                    zoomLevel = 12;
+                }
+                
+                // Gunakan setView dengan zoom level yang sudah ditentukan
+                // Ini akan zoom in lebih dekat dibanding fitBounds
+                map.setView(center, zoomLevel);
+                
+                // Jika jarak terlalu jauh, gunakan fitBounds dengan padding minimal
+                if (directDistance > 10) {
+                    map.fitBounds(bounds.pad(0.1), {
+                        padding: [30, 30]
+                    });
+                }
+            }, 100);
             
             // Hitung dan tampilkan rute dari restoran ke lokasi pelanggan
             getRoute(restoLatLng, latLng);
@@ -2677,6 +2715,23 @@
                     return;
                 }
                 
+                // Validasi: pastikan nama pembeli sudah diisi
+                const customerNameInput = document.getElementById("customer_name");
+                const customerName = customerNameInput.value.trim();
+                
+                if (!customerName || customerName === "") {
+                    showToast("Silakan isi nama pembeli terlebih dahulu!", 'error');
+                    // Scroll ke input nama pembeli
+                    customerNameInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    customerNameInput.focus();
+                    // Tambahkan border merah untuk menunjukkan error
+                    customerNameInput.style.borderColor = '#dc3545';
+                    setTimeout(() => {
+                        customerNameInput.style.borderColor = '';
+                    }, 3000);
+                    return;
+                }
+                
                 // Format jarak untuk ditampilkan di pesan WhatsApp
                 let distanceForMessage = "";
                 if (distance < 1) {
@@ -2688,9 +2743,6 @@
                     distanceForMessage = distance.toFixed(2) + " km";
                 }
                 
-                // Ambil nama pembeli dari input
-                const customerName = document.getElementById("customer_name").value.trim();
-                
                 // Ambil catatan/request khusus dari input textarea
                 const customerNote = document.getElementById("customer_note").value.trim();
                 
@@ -2701,10 +2753,8 @@
                 // Buat template pesan WhatsApp dengan informasi lengkap
                 let pesanWA = `Halo, saya ingin memesan makanan.\n\n`;
                 
-                // Tambahkan nama pembeli jika diisi
-                if (customerName) {
-                    pesanWA += `👤 *Nama Pembeli:* ${customerName}\n\n`;
-                }
+                // Tambahkan nama pembeli (wajib)
+                pesanWA += `👤 *Nama Pembeli:* ${customerName}\n\n`;
                 
                 // Tambahkan detail menu yang dipilih
                 const allItems = [...menuData.foods];
@@ -2840,13 +2890,11 @@
          * @param {Object} to - Koordinat titik tujuan {lat, lng}
          */
         function getRoute(from, to) {
-            // Hapus rute lama jika ada sebelum membuat rute baru
-            if (routeLine) {
-                map.removeLayer(routeLine);
-            }
-
             // Simpan lokasi pelanggan untuk digunakan nanti saat update info
             const customerLocation = to;
+            
+            // Simpan rute lama untuk dihapus nanti setelah rute baru berhasil dibuat
+            const oldRouteLine = routeLine;
 
             // Buat URL untuk request rute ke OSRM API
             // overview=full: dapatkan detail lengkap rute
@@ -2864,6 +2912,7 @@
                     return response.json();
                 })
                 .then(data => {
+                    console.log('OSRM API response:', data);
                     // Cek jika rute berhasil didapatkan
                     if (data.code === 'Ok' && data.routes && data.routes.length > 0) {
                         try {
@@ -2889,17 +2938,71 @@
                             const latlngs = coordinates.map(coord => [coord[0], coord[1]]);
                             
                             // Buat polyline (garis rute) dengan styling yang mengikuti lekukan jalan
-                            routeLine = L.polyline(latlngs, {
-                                color: "#00e6e6",      // Warna biru cyan
+                            const newRouteLine = L.polyline(latlngs, {
+                                color: "#0066ff",      // Warna biru yang lebih kontras
                                 weight: 6,             // Ketebalan garis 6px
-                                opacity: 0.95,        // Opacity 95%
+                                opacity: 1,            // Opacity 100% untuk visibilitas maksimal
                                 smoothFactor: 0.5,     // Faktor smoothing rendah = lebih detail, mengikuti lekukan jalan lebih baik
                                 lineCap: 'round',     // Ujung garis bulat
-                                lineJoin: 'round'     // Sambungan garis bulat
-                            }).addTo(map);
+                                lineJoin: 'round',    // Sambungan garis bulat
+                                dashArray: null       // Garis solid (tidak putus-putus)
+                            });
+                            
+                            // Tambahkan ke map
+                            newRouteLine.addTo(map);
+                            
+                            console.log('Route line created and added to map:', newRouteLine);
+                            console.log('Route line coordinates count:', latlngs.length);
+                            
+                            // Hapus rute lama jika ada, setelah rute baru berhasil dibuat dan ditambahkan ke map
+                            if (oldRouteLine) {
+                                map.removeLayer(oldRouteLine);
+                            }
+                            
+                            // Set routeLine ke rute baru yang sudah dibuat
+                            routeLine = newRouteLine;
                             
                             // Bawa garis rute ke depan agar terlihat di atas elemen lain
                             routeLine.bringToFront();
+                            
+                            // Update view peta untuk memastikan rute dan kedua marker terlihat dengan baik
+                            setTimeout(() => {
+                                if (restoMarker && customerMarker) {
+                                    const group = new L.featureGroup([restoMarker, customerMarker, routeLine]);
+                                    const bounds = group.getBounds();
+                                    const center = bounds.getCenter();
+                                    
+                                    // Tentukan zoom level berdasarkan jarak - semakin dekat semakin tinggi zoom
+                                    let zoomLevel;
+                                    if (calculatedDistance < 0.5) {
+                                        // Jarak sangat dekat (< 500m), zoom sangat dekat
+                                        zoomLevel = 16;
+                                    } else if (calculatedDistance < 1) {
+                                        // Jarak dekat (< 1 km), zoom dekat
+                                        zoomLevel = 15;
+                                    } else if (calculatedDistance < 3) {
+                                        // Jarak sedang (1-3 km), zoom sedang-dekat
+                                        zoomLevel = 14;
+                                    } else if (calculatedDistance < 5) {
+                                        // Jarak agak jauh (3-5 km), zoom sedang
+                                        zoomLevel = 13;
+                                    } else {
+                                        // Jarak jauh (> 5 km), zoom agak jauh tapi tetap terlihat jelas
+                                        zoomLevel = 12;
+                                    }
+                                    
+                                    // Gunakan setView dengan zoom level yang sudah ditentukan
+                                    // Ini akan zoom in lebih dekat dibanding fitBounds
+                                    map.setView(center, zoomLevel);
+                                    
+                                    // Jika jarak terlalu jauh, gunakan fitBounds dengan padding minimal
+                                    if (calculatedDistance > 10) {
+                                        map.fitBounds(bounds.pad(0.1), {
+                                            padding: [30, 30]
+                                        });
+                                    }
+                                }
+                            }, 200);
                             
                             // Update informasi jarak dan ongkir dengan jarak rute yang sebenarnya
                             updateInfo(customerLocation, calculatedDistance);
@@ -2939,15 +3042,72 @@
                                     
                                     // Buat polyline dengan koordinat yang sudah di-decode
                                     const latlngs = coordinates.map(coord => [coord[0], coord[1]]);
-                                    routeLine = L.polyline(latlngs, {
-                                        color: "#00e6e6",
-                                        weight: 6,
-                                        opacity: 0.95,
+                                    
+                                    // Buat polyline baru
+                                    const newRouteLine = L.polyline(latlngs, {
+                                        color: "#0066ff",      // Warna biru yang lebih kontras
+                                        weight: 6,             // Ketebalan garis 6px
+                                        opacity: 1,            // Opacity 100% untuk visibilitas maksimal
                                         smoothFactor: 0.5,
                                         lineCap: 'round',
-                                        lineJoin: 'round'
-                                    }).addTo(map);
+                                        lineJoin: 'round',
+                                        dashArray: null        // Garis solid (tidak putus-putus)
+                                    });
+                                    
+                                    // Tambahkan ke map
+                                    newRouteLine.addTo(map);
+                                    
+                                    console.log('Fallback route line created and added to map:', newRouteLine);
+                                    console.log('Fallback route line coordinates count:', latlngs.length);
+                                    
+                                    // Hapus rute lama jika ada, setelah rute baru berhasil dibuat dan ditambahkan ke map
+                                    if (oldRouteLine) {
+                                        map.removeLayer(oldRouteLine);
+                                    }
+                                    
+                                    // Set routeLine ke rute baru yang sudah dibuat
+                                    routeLine = newRouteLine;
+                                    
                                     routeLine.bringToFront();
+                                    
+                                    // Update view peta untuk memastikan rute dan kedua marker terlihat dengan baik
+                                    setTimeout(() => {
+                                        if (restoMarker && customerMarker) {
+                                            const group = new L.featureGroup([restoMarker, customerMarker, routeLine]);
+                                            const bounds = group.getBounds();
+                                            const center = bounds.getCenter();
+                                            
+                                            // Tentukan zoom level berdasarkan jarak - semakin dekat semakin tinggi zoom
+                                            let zoomLevel;
+                                            if (calculatedDistance < 0.5) {
+                                                // Jarak sangat dekat (< 500m), zoom sangat dekat
+                                                zoomLevel = 16;
+                                            } else if (calculatedDistance < 1) {
+                                                // Jarak dekat (< 1 km), zoom dekat
+                                                zoomLevel = 15;
+                                            } else if (calculatedDistance < 3) {
+                                                // Jarak sedang (1-3 km), zoom sedang-dekat
+                                                zoomLevel = 14;
+                                            } else if (calculatedDistance < 5) {
+                                                // Jarak agak jauh (3-5 km), zoom sedang
+                                                zoomLevel = 13;
+                                            } else {
+                                                // Jarak jauh (> 5 km), zoom agak jauh tapi tetap terlihat jelas
+                                                zoomLevel = 12;
+                                            }
+                                            
+                                            // Gunakan setView dengan zoom level yang sudah ditentukan
+                                            // Ini akan zoom in lebih dekat dibanding fitBounds
+                                            map.setView(center, zoomLevel);
+                                            
+                                            // Jika jarak terlalu jauh, gunakan fitBounds dengan padding minimal
+                                            if (calculatedDistance > 10) {
+                                                map.fitBounds(bounds.pad(0.1), {
+                                                    padding: [30, 30]
+                                                });
+                                            }
+                                        }
+                                    }, 200);
                                     
                                     // Update informasi dengan jarak rute
                                     updateInfo(customerLocation, calculatedDistance);
