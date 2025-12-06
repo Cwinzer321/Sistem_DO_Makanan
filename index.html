@@ -1362,6 +1362,30 @@
                             </div>
                             
                             <div class="mt-3" id="noteSection" style="display: none;">
+                                <!-- Dropdown Pilihan Lokasi -->
+                                <div id="lokasiDropdown" style="display: none; margin-bottom: 1rem;">
+                                    <label for="lokasi_select" class="form-label" style="color: var(--text-primary); font-weight: 500; margin-bottom: 0.5rem;">
+                                        <i class="fas fa-map-marker-alt"></i> Pilih Lokasi <span style="color: #dc3545;">*</span>
+                                    </label>
+                                    <select 
+                                        class="form-control input-box" 
+                                        id="lokasi_select"
+                                        required
+                                        style="margin-bottom: 1rem;">
+                                        <option value="">-- Pilih Lokasi --</option>
+                                        <option value="mekarjaya">Mekarjaya</option>
+                                        <option value="bojongsari">Bojongsari</option>
+                                        <option value="karangharum">Karangharum</option>
+                                        <option value="karangmekar">Karangmekar</option>
+                                        <option value="karangsambung">Karangsambung</option>
+                                        <option value="kedungwaringin">Kedungwaringin</option>
+                                        <option value="waringinjaya">Waringinjaya</option>
+                                    </select>
+                                    <small class="text-muted" style="color: var(--text-secondary); font-size: 0.85rem;">
+                                        <i class="fas fa-info-circle"></i> Pilih lokasi pengiriman Anda (Wajib)
+                                    </small>
+                                </div>
+                                
                                 <label for="customer_name" class="form-label" style="color: var(--text-primary); font-weight: 500; margin-bottom: 0.5rem;">
                                     <i class="fas fa-user"></i> Nama Pembeli
                                 </label>
@@ -2024,17 +2048,21 @@
                 }
             });
             
-            // Parse ongkir dari text (format: "Rp 15.000" atau "-")
+            // Parse ongkir dari text (format: "Rp 15.000", "Gratis", atau "-")
             let ongkir = 0;
-            if (ongkirText !== '-') {
-                const ongkirMatch = ongkirText.match(/[\d.]+/);
-                if (ongkirMatch) {
-                    ongkir = parseInt(ongkirMatch[0].replace(/\./g, ''));
+            if (ongkirText !== '-' && ongkirText !== 'Menghitung...') {
+                if (ongkirText.toLowerCase().includes('gratis')) {
+                    ongkir = 0;
+                } else {
+                    const ongkirMatch = ongkirText.match(/[\d.]+/);
+                    if (ongkirMatch) {
+                        ongkir = parseInt(ongkirMatch[0].replace(/\./g, ''));
+                    }
                 }
             }
             
-            // Tampilkan total pembayaran jika ongkir sudah dihitung
-            if (ongkir > 0) {
+            // Tampilkan total pembayaran jika ongkir sudah dihitung (termasuk jika gratis)
+            if (ongkirText !== '-' && ongkirText !== 'Menghitung...') {
                 const total = totalMenuPrice + ongkir;
                 totalPayment.textContent = `Rp ${total.toLocaleString('id-ID')}`;
                 totalPaymentItem.style.display = 'flex';
@@ -2238,6 +2266,14 @@
          * @param {Object} latLng - Objek dengan property lat dan lng
          */
         function updateCustomerLocation(latLng) {
+            // Reset dropdown dan section saat lokasi berubah
+            document.getElementById("noteSection").style.display = "none";
+            document.getElementById("whatsappButton").style.display = "none";
+            document.getElementById("lokasiDropdown").style.display = "none";
+            document.getElementById("ongkir").innerText = "-";
+            document.getElementById("customer_name").value = "";
+            document.getElementById("customer_note").value = "";
+            
             // Validasi koordinat: pastikan dalam range yang valid
             // Latitude harus antara -90 sampai 90, Longitude harus antara -180 sampai 180
             if (latLng.lat < -90 || latLng.lat > 90 || latLng.lng < -180 || latLng.lng > 180) {
@@ -2362,14 +2398,90 @@
         }
 
         /**
-         * Menghitung ongkos kirim berdasarkan jarak
+         * Daftar desa yang mendapat ongkir berdasarkan jarak
+         */
+        const desaBerbayar = [
+            'bojongsari',
+            'karangharum',
+            'karangmekar',
+            'karangsambung',
+            'kedungwaringin',
+            'waringinjaya'
+        ];
+
+        /**
+         * Mengecek jenis lokasi menggunakan reverse geocoding
+         * @param {number} lat - Latitude lokasi
+         * @param {number} lng - Longitude lokasi
+         * @returns {Promise<Object>} - {type: "mekarjaya"|"desa_berbayar"|"luar", desa: string|null}
+         */
+        async function checkLocationType(lat, lng) {
+            try {
+                // Gunakan Nominatim reverse geocoding API (gratis)
+                const url = `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&addressdetails=1`;
+                
+                const response = await fetch(url, {
+                    headers: {
+                        'User-Agent': 'Sistem-DO-Makanan/1.0'
+                    }
+                });
+                
+                if (!response.ok) {
+                    console.error('Reverse geocoding failed');
+                    return {type: 'luar', desa: null};
+                }
+                
+                const data = await response.json();
+                
+                // Cek di berbagai field alamat
+                const address = JSON.stringify(data.address || {}).toLowerCase();
+                const displayName = (data.display_name || '').toLowerCase();
+                const village = (data.address?.village || '').toLowerCase();
+                const suburb = (data.address?.suburb || '').toLowerCase();
+                const hamlet = (data.address?.hamlet || '').toLowerCase();
+                
+                // Cek apakah di Mekarjaya (gratis)
+                if (address.includes('mekarjaya') || displayName.includes('mekarjaya') ||
+                    village.includes('mekarjaya') || suburb.includes('mekarjaya') || 
+                    hamlet.includes('mekarjaya')) {
+                    return {type: 'mekarjaya', desa: 'mekarjaya'};
+                }
+                
+                // Cek apakah di salah satu desa berbayar dan return nama desa spesifik
+                for (const desa of desaBerbayar) {
+                    if (address.includes(desa) || displayName.includes(desa) ||
+                        village.includes(desa) || suburb.includes(desa) || 
+                        hamlet.includes(desa)) {
+                        return {type: 'desa_berbayar', desa: desa};
+                    }
+                }
+                
+                return {type: 'luar', desa: null};
+            } catch (error) {
+                console.error('Error checking location:', error);
+                // Jika error, default ke luar
+                return {type: 'luar', desa: null};
+            }
+        }
+
+        /**
+         * Menghitung ongkos kirim berdasarkan jarak untuk desa berbayar
          * @param {number} distance - Jarak dalam kilometer
          * @returns {number} - Ongkos kirim dalam rupiah
          */
-        function calculateOngkir(distance) {
-            const farePerKm = 500;  // Tarif per kilometer (Rp 500/km)
-            // Bulatkan jarak ke atas (ceil) untuk menghitung ongkir
-            return Math.ceil(distance) * farePerKm;
+        function calculateOngkirByDistance(distance) {
+            if (distance <= 2) {
+                // Jarak <= 2 km: ongkir 3000
+                return 3000;
+            } else if (distance <= 4) {
+                // Jarak > 2 km dan <= 4 km: ongkir 3000-5000 (random atau bisa 4000)
+                return Math.floor(Math.random() * (5000 - 3000 + 1)) + 3000;
+            } else {
+                // Jarak > 4 km: ongkir 5000 atau lebih
+                // Untuk jarak > 4 km, tambahkan 500 per km tambahan
+                const tambahanKm = Math.ceil(distance - 4);
+                return 5000 + (tambahanKm * 500);
+            }
         }
 
         /**
@@ -2420,109 +2532,229 @@
             // Update tampilan jarak di UI
             document.getElementById("jarak").innerText = distanceText;
 
-            // Validasi jarak maksimal: jika lebih dari 50 km, tampilkan error
-            if (distance > 50) {
-                // Jika jarak melebihi 50 km, tampilkan error dan sembunyikan fitur pemesanan
-                showToast("Jarak anda sangat jauh (>50 km). Kami tidak dapat melakukan delivery order ke lokasi ini.", 'error');
-                document.getElementById("ongkir").innerText = "-";
-                document.getElementById("whatsappButton").style.display = "none";
-                document.getElementById("noteSection").style.display = "none";
-                // Reset field nama dan catatan
-                document.getElementById("customer_name").value = "";
-                document.getElementById("customer_note").value = "";
-                return;  // Keluar dari fungsi, tidak lanjut ke proses berikutnya
-            }
-
-            // Jika jarak valid (<= 50 km), lanjutkan proses
+            // Jika jarak valid, lanjutkan proses
             if (distance > 0) {
-                // Hitung ongkir berdasarkan jarak
-                const ongkir = calculateOngkir(distance);
-                // Update tampilan ongkir dengan format rupiah Indonesia
-                document.getElementById("ongkir").innerText = `Rp ${ongkir.toLocaleString("id-ID")}`;
-
-                // Update total pembayaran (menu + ongkir)
-                updateTotalPayment();
-
-                // Tampilkan section untuk input catatan/note
-                document.getElementById("noteSection").style.display = "block";
-
-                // Tampilkan tombol WhatsApp dan setup event handler
-                const whatsappButton = document.getElementById("whatsappButton");
-                whatsappButton.style.display = "block";
+                // Tampilkan loading untuk ongkir
+                document.getElementById("ongkir").innerText = "Menghitung...";
                 
-                // Event handler untuk tombol kirim ke WhatsApp
-                whatsappButton.onclick = () => {
-                    // Format jarak untuk ditampilkan di pesan WhatsApp
-                    let distanceForMessage = "";
-                    if (distance < 1) {
-                        // Jika < 1 km, tampilkan dalam meter
-                        const distanceInMeters = Math.round(distance * 1000);
-                        distanceForMessage = distanceInMeters + " m";
-                    } else {
-                        // Jika >= 1 km, tampilkan dalam kilometer dengan 2 desimal
-                        distanceForMessage = distance.toFixed(2) + " km";
-                    }
-                    
-                    // Ambil nama pembeli dari input
-                    const customerName = document.getElementById("customer_name").value.trim();
-                    
-                    // Ambil catatan/request khusus dari input textarea
-                    const customerNote = document.getElementById("customer_note").value.trim();
-                    
-                    // Buat link Google Maps untuk share location pelanggan
-                    // Link ini akan membuka Google Maps dengan pin di lokasi pelanggan
-                    const googleMapsLink = `https://www.google.com/maps?q=${customerLatLng.lat},${customerLatLng.lng}`;
-                    
-                    // Buat template pesan WhatsApp dengan informasi lengkap
-                    let pesanWA = `Halo, saya ingin memesan makanan.\n\n`;
-                    
-                    // Tambahkan nama pembeli jika diisi
-                    if (customerName) {
-                        pesanWA += `👤 *Nama Pembeli:* ${customerName}\n\n`;
-                    }
-                    
-                    // Tambahkan detail menu yang dipilih
-                    const allItems = [...menuData.foods];
-                    let menuItems = [];
-                    let totalMenuPrice = 0;
-                    
-                    allItems.forEach(item => {
-                        const quantity = selectedMenu[item.id]?.quantity || 0;
-                        if (quantity > 0) {
-                            const itemTotal = item.price * quantity;
-                            totalMenuPrice += itemTotal;
-                            menuItems.push(`${item.name} x${quantity} = Rp ${itemTotal.toLocaleString('id-ID')}`);
+                // Cek jenis lokasi (async)
+                checkLocationType(customerLatLng.lat, customerLatLng.lng)
+                    .then(locationInfo => {
+                        // Tampilkan section untuk input catatan/note
+                        document.getElementById("noteSection").style.display = "block";
+                        
+                        // Tampilkan dropdown lokasi
+                        const lokasiDropdown = document.getElementById("lokasiDropdown");
+                        lokasiDropdown.style.display = "block";
+                        
+                        let initialOngkir = 0;
+                        
+                        // Set default value berdasarkan deteksi lokasi
+                        const lokasiSelect = document.getElementById("lokasi_select");
+                        
+                        if (locationInfo.type === 'mekarjaya') {
+                            lokasiSelect.value = "mekarjaya";
+                            document.getElementById("ongkir").innerText = "Gratis";
+                            initialOngkir = 0;
+                        } else if (locationInfo.type === 'desa_berbayar' && locationInfo.desa) {
+                            // Untuk desa berbayar, set dropdown ke desa yang terdeteksi
+                            lokasiSelect.value = locationInfo.desa;
+                            // Hitung ongkir berdasarkan jarak
+                            initialOngkir = calculateOngkirByDistance(distance);
+                            document.getElementById("ongkir").innerText = `Rp ${initialOngkir.toLocaleString("id-ID")}`;
+                        } else {
+                            // Lokasi tidak terdeteksi, biarkan user memilih sendiri
+                            lokasiSelect.value = "";
+                            document.getElementById("ongkir").innerText = "-";
+                            initialOngkir = 0;
                         }
-                    });
-                    
-                    if (menuItems.length > 0) {
-                        pesanWA += `🍽️ *Pesanan Saya:*\n${menuItems.join('\n')}\n`;
-                        pesanWA += `\n💰 *Subtotal Menu:* Rp ${totalMenuPrice.toLocaleString('id-ID')}\n`;
-                    }
-                    
-                    pesanWA += `\n📍 *Lokasi Saya:*\n${googleMapsLink}\n\nKoordinat:\nLatitude: ${customerLatLng.lat.toFixed(6)}\nLongitude: ${customerLatLng.lng.toFixed(6)}\n\n📏 Jarak: ${distanceForMessage}\n💰 Ongkir: Rp ${ongkir.toLocaleString("id-ID")}`;
-                    
-                    // Hitung total keseluruhan
-                    const totalAll = totalMenuPrice + ongkir;
-                    pesanWA += `\n\n💵 *Total Pembayaran:* Rp ${totalAll.toLocaleString('id-ID')}`;
-                    
-                    // Tambahkan catatan/request jika user mengisi field note
-                    if (customerNote) {
-                        pesanWA += `\n\n📝 *Catatan:*\n${customerNote}`;
-                    }
-                    
-                    // Tambahkan instruksi untuk membuka Google Maps
-                    pesanWA += `\n\nKlik link di atas untuk melihat lokasi di Google Maps.\n\nTerima kasih!`;
-                    
-                    // WA Testing Desi
-                    // Encode pesan untuk URL dan buka WhatsApp dengan pesan yang sudah disiapkan
-                    const linkWA = `https://wa.me/6285882900757?text=${encodeURIComponent(pesanWA)}`;
+                        
+                        // Setup event handler untuk dropdown lokasi
+                        setupLokasiDropdown(customerLatLng, distance);
 
-                    // WA Testing raihan
-                    // const linkWA = `https://wa.me/6285157204233?text=${encodeURIComponent(pesanWA)}`;
-                    window.open(linkWA, "_blank");  // Buka di tab baru
-                };
+                        // Update total pembayaran (menu + ongkir)
+                        updateTotalPayment();
+
+                        // Tampilkan tombol WhatsApp dan setup event handler dengan ongkir awal
+                        const whatsappButton = document.getElementById("whatsappButton");
+                        whatsappButton.style.display = "block";
+                        setupWhatsAppButton(customerLatLng, distance, initialOngkir);
+                    })
+                    .catch(error => {
+                        console.error('Error checking location:', error);
+                        // Jika error, tampilkan dropdown dan biarkan user memilih
+                        document.getElementById("noteSection").style.display = "block";
+                        const lokasiDropdown = document.getElementById("lokasiDropdown");
+                        lokasiDropdown.style.display = "block";
+                        const lokasiSelect = document.getElementById("lokasi_select");
+                        // Biarkan dropdown kosong, user harus memilih sendiri
+                        lokasiSelect.value = "";
+                        document.getElementById("ongkir").innerText = "-";
+                        setupLokasiDropdown(customerLatLng, distance);
+                        updateTotalPayment();
+                        const whatsappButton = document.getElementById("whatsappButton");
+                        whatsappButton.style.display = "block";
+                        // Setup dengan ongkir 0 dulu, akan diupdate saat user pilih lokasi
+                        setupWhatsAppButton(customerLatLng, distance, 0);
+                    });
             }
+        }
+
+        /**
+         * Setup event handler untuk dropdown lokasi
+         * @param {Object} customerLatLng - Koordinat lokasi pelanggan
+         * @param {number} distance - Jarak dalam kilometer
+         */
+        function setupLokasiDropdown(customerLatLng, distance) {
+            const lokasiSelect = document.getElementById("lokasi_select");
+            
+            // Daftar desa berbayar
+            const desaBerbayarList = ['bojongsari', 'karangharum', 'karangmekar', 'karangsambung', 'kedungwaringin', 'waringinjaya'];
+            
+            // Event handler untuk dropdown lokasi
+            lokasiSelect.onchange = () => {
+                const selectedLokasi = lokasiSelect.value;
+                let selectedOngkir = 0;
+                
+                // Reset border jika sebelumnya ada error
+                lokasiSelect.style.borderColor = '';
+                
+                if (!selectedLokasi || selectedLokasi === "") {
+                    // Jika belum dipilih, reset ongkir
+                    document.getElementById("ongkir").innerText = "-";
+                    updateTotalPayment();
+                    return;
+                }
+                
+                if (selectedLokasi === "mekarjaya") {
+                    // Gratis untuk Mekarjaya
+                    selectedOngkir = 0;
+                    document.getElementById("ongkir").innerText = "Gratis";
+                } else if (desaBerbayarList.includes(selectedLokasi)) {
+                    // Untuk desa berbayar, hitung ongkir berdasarkan jarak
+                    selectedOngkir = calculateOngkirByDistance(distance);
+                    document.getElementById("ongkir").innerText = `Rp ${selectedOngkir.toLocaleString("id-ID")}`;
+                }
+                
+                updateTotalPayment();
+                
+                // Update WhatsApp button dengan ongkir baru
+                const whatsappButton = document.getElementById("whatsappButton");
+                if (whatsappButton.style.display !== "none") {
+                    setupWhatsAppButton(customerLatLng, distance, selectedOngkir);
+                }
+            };
+        }
+
+        /**
+         * Setup event handler untuk tombol WhatsApp
+         * @param {Object} customerLatLng - Koordinat lokasi pelanggan
+         * @param {number} distance - Jarak dalam kilometer
+         * @param {number} ongkir - Ongkos kirim yang sudah dihitung
+         */
+        function setupWhatsAppButton(customerLatLng, distance, ongkir) {
+            const whatsappButton = document.getElementById("whatsappButton");
+            
+            // Hapus event listener lama jika ada
+            whatsappButton.onclick = null;
+            
+            // Event handler untuk tombol kirim ke WhatsApp
+            whatsappButton.onclick = () => {
+                // Validasi: pastikan lokasi sudah dipilih
+                const lokasiSelect = document.getElementById("lokasi_select");
+                const selectedLokasi = lokasiSelect.value;
+                
+                if (!selectedLokasi || selectedLokasi === "") {
+                    showToast("Silakan pilih lokasi terlebih dahulu!", 'error');
+                    // Scroll ke dropdown lokasi
+                    lokasiSelect.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    lokasiSelect.focus();
+                    // Tambahkan border merah untuk menunjukkan error
+                    lokasiSelect.style.borderColor = '#dc3545';
+                    setTimeout(() => {
+                        lokasiSelect.style.borderColor = '';
+                    }, 3000);
+                    return;
+                }
+                
+                // Format jarak untuk ditampilkan di pesan WhatsApp
+                let distanceForMessage = "";
+                if (distance < 1) {
+                    // Jika < 1 km, tampilkan dalam meter
+                    const distanceInMeters = Math.round(distance * 1000);
+                    distanceForMessage = distanceInMeters + " m";
+                } else {
+                    // Jika >= 1 km, tampilkan dalam kilometer dengan 2 desimal
+                    distanceForMessage = distance.toFixed(2) + " km";
+                }
+                
+                // Ambil nama pembeli dari input
+                const customerName = document.getElementById("customer_name").value.trim();
+                
+                // Ambil catatan/request khusus dari input textarea
+                const customerNote = document.getElementById("customer_note").value.trim();
+                
+                // Buat link Google Maps untuk share location pelanggan
+                // Link ini akan membuka Google Maps dengan pin di lokasi pelanggan
+                const googleMapsLink = `https://www.google.com/maps?q=${customerLatLng.lat},${customerLatLng.lng}`;
+                
+                // Buat template pesan WhatsApp dengan informasi lengkap
+                let pesanWA = `Halo, saya ingin memesan makanan.\n\n`;
+                
+                // Tambahkan nama pembeli jika diisi
+                if (customerName) {
+                    pesanWA += `👤 *Nama Pembeli:* ${customerName}\n\n`;
+                }
+                
+                // Tambahkan detail menu yang dipilih
+                const allItems = [...menuData.foods];
+                let menuItems = [];
+                let totalMenuPrice = 0;
+                
+                allItems.forEach(item => {
+                    const quantity = selectedMenu[item.id]?.quantity || 0;
+                    if (quantity > 0) {
+                        const itemTotal = item.price * quantity;
+                        totalMenuPrice += itemTotal;
+                        menuItems.push(`${item.name} x${quantity} = Rp ${itemTotal.toLocaleString('id-ID')}`);
+                    }
+                });
+                
+                if (menuItems.length > 0) {
+                    pesanWA += `🍽️ *Pesanan Saya:*\n${menuItems.join('\n')}\n`;
+                    pesanWA += `\n💰 *Subtotal Menu:* Rp ${totalMenuPrice.toLocaleString('id-ID')}\n`;
+                }
+                
+                // Format ongkir untuk pesan
+                let ongkirMessage = "";
+                if (ongkir === 0) {
+                    ongkirMessage = "Gratis";
+                } else {
+                    ongkirMessage = `Rp ${ongkir.toLocaleString("id-ID")}`;
+                }
+                
+                pesanWA += `\n📍 *Lokasi Saya:*\n${googleMapsLink}\n\nKoordinat:\nLatitude: ${customerLatLng.lat.toFixed(6)}\nLongitude: ${customerLatLng.lng.toFixed(6)}\n\n📏 Jarak: ${distanceForMessage}\n💰 Ongkir: ${ongkirMessage}`;
+                
+                // Hitung total keseluruhan
+                const totalAll = totalMenuPrice + ongkir;
+                pesanWA += `\n\n💵 *Total Pembayaran:* Rp ${totalAll.toLocaleString('id-ID')}`;
+                
+                // Tambahkan catatan/request jika user mengisi field note
+                if (customerNote) {
+                    pesanWA += `\n\n📝 *Catatan:*\n${customerNote}`;
+                }
+                
+                // Tambahkan instruksi untuk membuka Google Maps
+                pesanWA += `\n\nKlik link di atas untuk melihat lokasi di Google Maps.\n\nTerima kasih!`;
+                
+                // WA Testing Desi
+                // Encode pesan untuk URL dan buka WhatsApp dengan pesan yang sudah disiapkan
+                // const linkWA = `https://wa.me/6285882900757?text=${encodeURIComponent(pesanWA)}`;
+
+                // WA Testing raihan
+                const linkWA = `https://wa.me/6285157204233?text=${encodeURIComponent(pesanWA)}`;
+                window.open(linkWA, "_blank");  // Buka di tab baru
+            };
         }
 
         // ============================================
